@@ -1,0 +1,27 @@
+{
+  "name": "vibechat-complete",
+  "version": "1.0.0",
+  "description": "Complete VibeChat application with all services",
+  "main": "update-server.js",
+  "scripts": {
+    "start": "node update-server.js",
+    "update-server": "node update-server.js",
+    "test": "echo 'No tests defined'",
+    "build": "echo 'Use build-and-deploy.bat for building'"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "vibechat-room-server": "file:chat-rooms"
+  },
+  "keywords": [
+    "chat",
+    "real-time",
+    "electron",
+    "react",
+    "java",
+    "spring-boot"
+  ],
+  "author": "VibeChat Team",
+  "license": "MIT"
+}

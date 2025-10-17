@@ -14,15 +14,20 @@ import {
   LinkGenerationRequest,
   LinkGenerationResponse,
   AIAnalysisRequest,
-  AIAnalysisResponse
+  AIAnalysisResponse,
+  Subscription,
+  CreateSubscriptionRequest
 } from '../types';
 
 class ApiService {
   private client: AxiosInstance;
 
   constructor() {
+    // Detect if running in Electron
+    const isElectron = typeof window !== 'undefined' && window.electron;
+
     this.client = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+      baseURL: process.env.REACT_APP_API_URL || (isElectron ? 'http://localhost:8082/api' : 'http://localhost:8082/api'),
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -169,6 +174,43 @@ class ApiService {
 
   async analyzeText(data: AIAnalysisRequest): Promise<ApiResponse<AIAnalysisResponse>> {
     const response: AxiosResponse<ApiResponse<AIAnalysisResponse>> = await this.client.post('/ai/analyze-text', data);
+    return response.data;
+  }
+
+  // Subscription endpoints
+  async getAvailableTiers(): Promise<ApiResponse<Record<string, any>>> {
+    const response: AxiosResponse<ApiResponse<Record<string, any>>> = await this.client.get('/subscriptions/tiers');
+    return response.data;
+  }
+
+  async getMySubscriptions(): Promise<ApiResponse<Subscription[]>> {
+    const response: AxiosResponse<ApiResponse<Subscription[]>> = await this.client.get('/subscriptions/my');
+    return response.data;
+  }
+
+  async purchaseSubscription(data: CreateSubscriptionRequest): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.post('/subscriptions/purchase', data);
+    return response.data;
+  }
+
+  async cancelSubscription(subscriptionId: number): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.post(`/subscriptions/cancel/${subscriptionId}`);
+    return response.data;
+  }
+
+  async getSubscriptionStats(): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.client.get('/subscriptions/stats');
+    return response.data;
+  }
+
+  // Payment methods endpoints
+  async getPaymentMethods(): Promise<ApiResponse<Record<string, any>>> {
+    const response: AxiosResponse<ApiResponse<Record<string, any>>> = await this.client.get('/subscriptions/payment-methods');
+    return response.data;
+  }
+
+  async getBTCWallet(): Promise<ApiResponse<{ btcWallet: string }>> {
+    const response: AxiosResponse<ApiResponse<{ btcWallet: string }>> = await this.client.get('/subscriptions/btc-wallet');
     return response.data;
   }
 }

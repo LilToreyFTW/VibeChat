@@ -32,6 +32,9 @@ import {
   Cancel as CancelIcon,
   Info as InfoIcon,
   EmojiObjects as BotIcon,
+  Schedule as ScheduleIcon,
+  Link as LinkIcon,
+  Timer as TimerIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
@@ -48,6 +51,8 @@ const CreateRoom: React.FC = () => {
     description: '',
     maxMembers: 50,
     allowBots: true,
+    linkExpirationDays: 30,
+    permanentLink: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -216,6 +221,68 @@ const CreateRoom: React.FC = () => {
                         </Box>
                       }
                     />
+
+                    {/* Link Expiration Settings */}
+                    <Card sx={{ mt: 3 }}>
+                      <CardContent>
+                        <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <LinkIcon />
+                          Room Link Settings
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                          {/* Permanent Link Toggle */}
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={formData.permanentLink}
+                                onChange={(e) => {
+                                  handleInputChange('permanentLink', e.target.checked);
+                                  if (e.target.checked) {
+                                    handleInputChange('linkExpirationDays', 0);
+                                  }
+                                }}
+                                color="primary"
+                              />
+                            }
+                            label={
+                              <Box>
+                                <Typography variant="body1">Permanent Room Link</Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Create a link that never expires (cannot be undone)
+                                </Typography>
+                              </Box>
+                            }
+                          />
+
+                          {/* Link Expiration Days (only if not permanent) */}
+                          {!formData.permanentLink && (
+                            <TextField
+                              label="Link Expiration (Days)"
+                              type="number"
+                              value={formData.linkExpirationDays}
+                              onChange={(e) => handleInputChange('linkExpirationDays', parseInt(e.target.value) || 30)}
+                              inputProps={{ min: 1, max: 365 }}
+                              helperText="How many days before the room link expires (1-365 days)"
+                              fullWidth
+                            />
+                          )}
+
+                          {/* Link Preview */}
+                          <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                            <Typography variant="body2" color="text.secondary" gutterBottom>
+                              <strong>Link Preview:</strong>
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                              {formData.permanentLink
+                                ? 'https://CoreVibeChatrooms.com/ABC12345 (Permanent)'
+                                : `https://CoreVibeChatrooms.com/ABC12345 (Expires in ${formData.linkExpirationDays || 30} days)`
+                              }
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </CardContent>
+                    </Card>
 
                     {/* Submit Button */}
                     <Button

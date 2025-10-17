@@ -1,25 +1,44 @@
 package com.vibechat.service;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.internet.MimeMessage;
-import java.util.UUID;
 
 @Service
 public class EmailService {
 
-    @Autowired
+    @Autowired(required = false)
     private JavaMailSender mailSender;
 
     @Value("${vibechat.room.base-url}")
     private String baseUrl;
 
+    @Value("${vibechat.email.smtp.host:smtp.gmail.com}")
+    private String smtpHost;
+
+    @Value("${spring.mail.username:noreply@vibechat.com}")
+    private String fromEmail;
+
+    @Value("${vibechat.email.enabled:true}")
+    private boolean emailEnabled;
+
     public void sendVerificationEmail(String toEmail, String username, String verificationToken) {
+        if (!emailEnabled) {
+            System.out.println("Email sending is disabled. Verification token for " + username + ": " + verificationToken);
+            return;
+        }
+
+        if (mailSender == null) {
+            System.out.println("Mail sender not configured. Verification token for " + username + ": " + verificationToken);
+            return;
+        }
+
         try {
             String verificationUrl = baseUrl + "/verify-email?token=" + verificationToken;
 
@@ -28,7 +47,7 @@ public class EmailService {
 
             helper.setTo(toEmail);
             helper.setSubject("VibeChat - Verify Your Email Address");
-            helper.setFrom("noreply@vibechat.com");
+            helper.setFrom(fromEmail);
 
             String htmlContent = """
                 <html>
@@ -57,6 +76,10 @@ public class EmailService {
                         <p style="color: #999; font-size: 14px;">
                             For security reasons, this verification link will expire in 24 hours.
                         </p>
+
+                        <p style="color: #999; font-size: 12px; margin-top: 15px;">
+                            Verification Token: %s
+                        </p>
                     </div>
 
                     <div style="background: #f8f9fa; padding: 20px; text-align: center; border-radius: 10px; margin-top: 20px;">
@@ -66,14 +89,17 @@ public class EmailService {
                     </div>
                 </body>
                 </html>
-                """.formatted(username, verificationUrl);
+                """.formatted(username, verificationUrl, verificationToken);
 
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
+            System.out.println("Verification email sent to " + toEmail);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to send verification email: " + e.getMessage());
+            System.err.println("Failed to send verification email to " + toEmail + ": " + e.getMessage());
+            // For development, log the verification URL instead of throwing an exception
+            System.out.println("Verification URL for " + username + ": " + baseUrl + "/verify-email?token=" + verificationToken);
         }
     }
 

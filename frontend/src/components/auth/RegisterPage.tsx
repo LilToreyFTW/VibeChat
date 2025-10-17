@@ -1,91 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Container,
   Paper,
-  TextField,
-  Button,
   Typography,
   Box,
   Alert,
-  CircularProgress,
+  Button,
 } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/authStore';
-import { RegisterRequest } from '../../types';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError } = useAuthStore();
-
-  const [formData, setFormData] = useState<RegisterRequest>({
-    username: '',
-    email: '',
-    password: '',
-    fullName: '',
-  });
-
-  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear field error when user starts typing
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({
-        ...prev,
-        [name]: '',
-      }));
-    }
-
-    // Clear general error when user starts typing
-    if (error) {
-      clearError();
-    }
-  };
-
-  const validateForm = (): boolean => {
-    const errors: { [key: string]: string } = {};
-
-    if (!formData.username.trim()) {
-      errors.username = 'Username is required';
-    } else if (formData.username.length < 3) {
-      errors.username = 'Username must be at least 3 characters';
-    }
-
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
-    if (!formData.password.trim()) {
-      errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      await register(formData);
-      navigate('/verify-email');
-    } catch (error) {
-      // Error is handled by the store
-    }
-  };
 
   return (
     <Container component="main" maxWidth="sm">
@@ -98,102 +23,35 @@ const RegisterPage: React.FC = () => {
         }}
       >
         <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
-          <Typography component="h1" variant="h4" align="center" gutterBottom>
-            Join VibeChat
+          <Typography component="h1" variant="h4" align="center" gutterBottom className="gradient-text">
+            VibeChat Access Restricted
           </Typography>
 
-          <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 3 }}>
-            Create your account to get started
-          </Typography>
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Registration Disabled:</strong> New user registration is currently restricted.
+              Only the system administrator can create accounts. Please contact support for access.
+            </Typography>
+          </Alert>
 
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Access Information:</strong><br />
+              • User registration is currently restricted<br />
+              • Only the system administrator can create new accounts<br />
+              • For access, please use the owner login with the provided credentials<br />
+              • Contact the administrator if you need account access
+            </Typography>
+          </Alert>
 
-          <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
-              autoFocus
-              value={formData.username}
-              onChange={handleInputChange}
-              error={!!formErrors.username}
-              helperText={formErrors.username}
-              disabled={isLoading}
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              error={!!formErrors.email}
-              helperText={formErrors.email}
-              disabled={isLoading}
-            />
-
-            <TextField
-              margin="normal"
-              fullWidth
-              id="fullName"
-              label="Full Name (Optional)"
-              name="fullName"
-              autoComplete="name"
-              value={formData.fullName}
-              onChange={handleInputChange}
-              disabled={isLoading}
-            />
-
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="new-password"
-              value={formData.password}
-              onChange={handleInputChange}
-              error={!!formErrors.password}
-              helperText={formErrors.password}
-              disabled={isLoading}
-            />
-
+          <Box sx={{ textAlign: 'center' }}>
             <Button
-              type="submit"
-              fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, height: 48 }}
-              disabled={isLoading}
+              onClick={() => navigate('/login')}
+              sx={{ mb: 2 }}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Create Account'
-              )}
+              Go to Owner Login
             </Button>
-
-            <Box sx={{ textAlign: 'center' }}>
-              <Typography variant="body2">
-                Already have an account?{' '}
-                <Link to="/login" style={{ textDecoration: 'none' }}>
-                  Sign in
-                </Link>
-              </Typography>
-            </Box>
           </Box>
         </Paper>
       </Box>

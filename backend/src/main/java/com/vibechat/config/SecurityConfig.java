@@ -1,5 +1,8 @@
 package com.vibechat.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,12 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -31,11 +32,19 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/h2-console/**", "/api/ai/**").permitAll()
-                .requestMatchers("/rooms/**", "/bots/**").authenticated()
+                // Use AntPathRequestMatcher for all endpoints to avoid servlet conflicts
+                .requestMatchers(
+                    new AntPathRequestMatcher("/h2-console/**"),
+                    new AntPathRequestMatcher("/auth/**"),
+                    new AntPathRequestMatcher("/actuator/**")
+                ).permitAll()
+                .requestMatchers(
+                    new AntPathRequestMatcher("/rooms/**"),
+                    new AntPathRequestMatcher("/bots/**")
+                ).authenticated()
                 .anyRequest().authenticated()
             )
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.deny())); // For H2 console
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // For H2 console
 
         return http.build();
     }

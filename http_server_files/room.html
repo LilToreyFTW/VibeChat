@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeChat Room - {{roomCode}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .room-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .room-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .room-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+            background: #f5f5f5;
+            padding: 8px 16px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .join-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .features {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #555;
+        }
+
+        .feature-icon {
+            color: #667eea;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .expiry-info {
+            margin-top: 20px;
+            padding: 12px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            color: #856404;
+        }
+
+        .permanent-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .room-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="room-icon">💬</span>
+
+        {{#if permanent}}
+        <div class="permanent-badge">🕒 Permanent Room Link</div>
+        {{else}}
+        <div class="expiry-info">
+            ⚠️ This room link expires in {{expirationDays}} days
+        </div>
+        {{/if}}
+
+        <h1 class="room-title">{{roomName}}</h1>
+        <div class="room-code">{{roomCode}}</div>
+
+        {{#if description}}
+        <p class="description">{{description}}</p>
+        {{/if}}
+
+        <a href="https://vibechat.com/chat/{{roomCode}}" class="join-btn">
+            🚀 Join Chat Room
+        </a>
+
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                Real-time messaging
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔒</span>
+                Secure & private
+            </div>
+            <div class="feature">
+                <span class="feature-icon">👥</span>
+                Up to {{maxMembers}} members
+            </div>
+            {{#if allowBots}}
+            <div class="feature">
+                <span class="feature-icon">🤖</span>
+                AI bots supported
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <script>
+        // Auto-redirect after 10 seconds for better UX
+        setTimeout(() => {
+            window.location.href = 'https://vibechat.com/chat/{{roomCode}}';
+        }, 10000);
+    </script>
+</body>
+</html>

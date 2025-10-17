@@ -17,52 +17,97 @@ import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import EmailVerificationPage from './components/auth/EmailVerificationPage';
 
+// Billing Components
+import SubscriptionManager from './components/billing/SubscriptionManager';
+
 // Hooks and Stores
 import { useAuthStore } from './store/authStore';
 
-// Create Discord-like dark theme
+// Create VibeChat modern theme
 const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#5865f2', // Discord blurple
+      main: '#8B5CF6', // VibeChat purple
     },
     secondary: {
-      main: '#57f287', // Discord green
+      main: '#EC4899', // VibeChat pink
     },
     background: {
-      default: '#313338', // Discord dark background
-      paper: '#2b2d31',
+      default: '#0F172A', // VibeChat dark
+      paper: 'rgba(255, 255, 255, 0.05)',
     },
     text: {
-      primary: '#dbdee1',
-      secondary: '#b5bac1',
+      primary: '#F8FAFC',
+      secondary: 'rgba(248, 250, 252, 0.7)',
     },
   },
   typography: {
-    fontFamily: '"Whitney", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 800,
+      background: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 50%, #06B6D4 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+    },
+    h2: {
+      fontWeight: 700,
+      background: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 50%, #06B6D4 100%)',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      backgroundClip: 'text',
+    },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          scrollbarColor: '#202225 #2f3136',
           '&::-webkit-scrollbar': {
             width: '8px',
           },
           '&::-webkit-scrollbar-track': {
-            background: '#2f3136',
+            background: 'rgba(15, 23, 42, 0.5)',
           },
           '&::-webkit-scrollbar-thumb': {
-            background: '#202225',
+            background: 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)',
             borderRadius: '4px',
           },
           '&::-webkit-scrollbar-thumb:hover': {
-            background: '#1a1b1e',
+            background: 'linear-gradient(135deg, #EC4899 0%, #06B6D4 100%)',
           },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          borderRadius: 12,
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: 16,
         },
       },
     },
@@ -159,7 +204,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <div className="App" style={{ height: '100vh' }}>
+        <div className="App" style={{ height: '100vh', position: 'relative' }}>
           <Routes>
             {/* Public Routes */}
             <Route
@@ -183,6 +228,15 @@ function App() {
               element={<EmailVerificationPage />}
             />
 
+            <Route
+              path="/boost"
+              element={
+                <ProtectedRoute>
+                  <SubscriptionManager />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Main Discord Interface */}
             <Route
               path="/*"
@@ -193,6 +247,11 @@ function App() {
               }
             />
           </Routes>
+
+          {/* VibeChat Watermark */}
+          <div className="watermark">
+            VibeChat
+          </div>
         </div>
       </Router>
     </ThemeProvider>

@@ -13,6 +13,9 @@ This guide provides complete instructions for deploying and running your fully f
 ✅ **Python AI Service** - `python-service/dist/VibeChat-AI-Service/VibeChat-AI-Service.exe`
 ✅ **Chat Rooms Server** - `chat-rooms/` (Node.js server)
 ✅ **Desktop Client** - `clients_chat_exe/dist/win-unpacked/VibeChat Desktop.exe`
+✅ **Desktop Installer** - `clients_chat_exe/dist/VibeChat Desktop Setup 1.0.0.exe`
+✅ **Update Server** - `update-server.js` (local update distribution)
+✅ **Auto-Updater System** - Seamless desktop app updates
 ✅ **Complete Documentation** - All configurations and setup instructions
 
 ---
@@ -78,7 +81,9 @@ Start-Process -FilePath "clients_chat_exe/dist/win-unpacked/VibeChat Desktop.exe
 - **Backend API**: http://localhost:8080/api
 - **Python AI Service**: http://localhost:8001
 - **Room Server**: http://localhost:3002
-- **Desktop App**: Launch `VibeChat Desktop.exe`
+- **Update Server**: http://localhost:3001
+- **Desktop Installer**: `clients_chat_exe/dist/VibeChat Desktop Setup 1.0.0.exe`
+- **Desktop App**: Install and launch from desktop shortcut
 
 ---
 
@@ -99,6 +104,59 @@ java -jar target/vibechat-backend-1.0.0.jar
 
 **Access**: http://localhost:8080/api
 **WebSocket**: ws://localhost:8080/ws
+
+#### **Email Configuration**
+For production, configure SMTP settings in `application.yml`:
+```yaml
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-email@gmail.com
+    password: your-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+```
+
+For development, email sending is disabled but verification tokens are logged to console.
+
+### **Desktop Application (Electron)**
+
+```bash
+# Navigate to electron directory
+cd clients_chat_exe
+
+# Install dependencies
+npm install
+
+# Build for production (creates installers)
+npm run build
+
+# Or build for specific platforms
+npm run build:win    # Windows .exe installer
+npm run build:mac    # macOS .dmg installer
+npm run build:linux  # Linux .AppImage
+
+# Start in development mode
+npm start
+```
+
+**Desktop Application Features**:
+- ✅ **Professional Installer** - `.exe` setup with desktop shortcuts
+- ✅ **Auto-Updater System** - Downloads updates from local server
+- ✅ **Cross-Platform** - Windows, macOS, Linux support
+- ✅ **Native Integration** - System tray, notifications, shortcuts
+
+**Update Server**:
+```bash
+# Start the update server
+node update-server.js
+```
+**Access**: http://localhost:3001/updates/
 
 ### **Frontend (React)**
 

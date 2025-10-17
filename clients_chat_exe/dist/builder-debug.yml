@@ -5,8 +5,11 @@ x64:
     - '!dist{,/**/*}'
     - main.js
     - preload.js
+    - index.html
     - build/**/*
     - node_modules/**/*
+    - '!**/node_modules/@types/**'
+    - '!**/node_modules/electron*/**'
     - package.json
     - '!**/*.{iml,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,suo,xproj,cc,d.ts,mk,a,o,forge-meta,pdb}'
     - '!**/._*'
@@ -19,5 +22,8 @@ x64:
     - '**/*'
     - main.js
     - preload.js
+    - index.html
     - build/**/*
     - node_modules/**/*
+    - '!**/node_modules/@types/**'
+    - '!**/node_modules/electron*/**'

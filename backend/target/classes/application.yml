@@ -1,11 +1,19 @@
 server:
-  port: 8080
+  port: 8082
   servlet:
     context-path: /api
+
+# TCP Server Configuration
+tcp:
+  server:
+    port: 8083
+    timeout: 30000
 
 spring:
   application:
     name: vibechat-backend
+  main:
+    allow-circular-references: true
 
   datasource:
     url: jdbc:h2:mem:vibechat
@@ -32,6 +40,21 @@ spring:
       secret: vibechat-secret-key-2024
       expiration: 864000000  # 10 days in milliseconds
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vibechat.noreply@gmail.com
+    password: your-app-password-here
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
 logging:
   level:
     com.vibechat: DEBUG
@@ -49,15 +72,13 @@ vibechat:
       - http://127.0.0.1:3000
       - http://127.0.0.1:8080
   email:
-    imap:
-      host: 127.0.0.1
-      port: 1143
-      username: toreythegizzler@pm.me
-      password: FTGBcxY9AbQPHaM4riksyw
-      security: STARTTLS
     smtp:
-      host: 127.0.0.1
-      port: 1025
-      username: toreythegizzler@pm.me
-      password: FTGBcxY9AbQPHaM4riksyw
+      host: smtp.gmail.com
+      port: 587
+      username: vibechat.noreply@gmail.com
+      password: your-app-password-here
       security: STARTTLS
+    # For development, disable email sending but keep verification working
+    enabled: false
+    verification:
+      enabled: false

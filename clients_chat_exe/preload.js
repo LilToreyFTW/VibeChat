@@ -24,6 +24,22 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onUpdateProgress: (callback) => ipcRenderer.on('update-progress', callback),
   onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', callback),
 
+  // Update actions
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadUpdate: () => ipcRenderer.invoke('download-update'),
+  quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
+
+  // HWID and Auto-start actions
+  getHWID: () => ipcRenderer.invoke('get-hwid'),
+  enableAutoStart: () => ipcRenderer.invoke('enable-auto-start'),
+  disableAutoStart: () => ipcRenderer.invoke('disable-auto-start'),
+  isAutoStartEnabled: () => ipcRenderer.invoke('is-auto-start-enabled'),
+  lockHWIDToAccount: (accountData) => ipcRenderer.invoke('lock-hwid-to-account', accountData),
+  unlockAccount: () => ipcRenderer.invoke('unlock-account'),
+
+  // Auto-login listener
+  onAutoLogin: (callback) => ipcRenderer.on('auto-login', callback),
+
   // Menu actions
   onMenuAction: (callback) => ipcRenderer.on('menu-action', callback),
 

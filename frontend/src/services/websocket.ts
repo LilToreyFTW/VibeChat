@@ -14,8 +14,12 @@ class WebSocketService {
         return;
       }
 
+      // Detect if running in Electron
+      const isElectron = typeof window !== 'undefined' && window.electron;
+      const wsUrl = isElectron ? 'http://localhost:8082/ws' : 'http://localhost:8082/ws';
+
       this.client = new Client({
-        webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+        webSocketFactory: () => new SockJS(wsUrl),
         connectHeaders: {},
         debug: (str) => {
           console.log('STOMP Debug:', str);

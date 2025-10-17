@@ -18,8 +18,8 @@ const LoginPage: React.FC = () => {
   const { login, user, error, clearError, isLoading } = useAuthStore();
 
   const [formData, setFormData] = useState<LoginRequest>({
-    username: '',
-    password: '',
+    username: 'AdminT',
+    password: 'Torey991200@##@@##',
   });
 
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
@@ -91,13 +91,16 @@ const LoginPage: React.FC = () => {
         }}
       >
         <Paper elevation={3} sx={{ padding: 4, width: '100%' }}>
-          <Typography component="h1" variant="h4" align="center" gutterBottom>
-            Welcome to VibeChat
+          <Typography component="h1" variant="h4" align="center" gutterBottom className="gradient-text">
+            VibeChat Owner Access
           </Typography>
 
-          <Typography variant="body1" align="center" color="text.secondary" sx={{ mb: 3 }}>
-            Sign in to your account
-          </Typography>
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            <Typography variant="body2">
+              <strong>Restricted Access:</strong> This login is reserved for the VibeChat system administrator only.
+              Unauthorized access attempts will be logged and monitored.
+            </Typography>
+          </Alert>
 
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -106,6 +109,14 @@ const LoginPage: React.FC = () => {
           )}
 
           <Box component="form" onSubmit={handleSubmit} noValidate>
+            <Alert severity="info" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                <strong>Owner Credentials:</strong><br />
+                Username: AdminT<br />
+                Password: Torey991200@##@@##
+              </Typography>
+            </Alert>
+
             <TextField
               margin="normal"
               required

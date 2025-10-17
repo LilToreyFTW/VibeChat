@@ -5,21 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibeChat Desktop</title>
     <style>
+        /* Hide body until React app loads */
         body {
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #667eea;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            overflow: hidden;
+        }
+
+        body.loaded {
+            opacity: 1;
+            background: transparent;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
 
         .loading-container {
             text-align: center;
             max-width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .logo {
@@ -49,6 +70,7 @@
         .status {
             margin-top: 1rem;
             opacity: 0.8;
+            font-size: 0.9rem;
         }
 
         .error {
@@ -57,40 +79,201 @@
             padding: 1rem;
             border-radius: 8px;
             margin-top: 1rem;
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .debug-info {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: monospace;
+            max-width: 300px;
+            word-break: break-all;
         }
     </style>
 </head>
 <body>
-    <div class="loading-container">
+    <!-- React app will be mounted here -->
+    <div id="root"></div>
+
+    <!-- Fallback loading screen -->
+    <div class="loading-container" id="loading-screen">
         <div class="logo">VibeChat</div>
         <div class="spinner"></div>
-        <div class="status">Loading VibeChat Desktop...</div>
+        <div class="status" id="status">Loading VibeChat Desktop...</div>
+        <div class="error" id="error" style="display: none;"></div>
+    </div>
+
+    <!-- Debug information panel -->
+    <div class="debug-info" id="debug-panel" style="display: none;">
+        <div><strong>Debug Mode Active</strong></div>
+        <div id="debug-status">Initializing...</div>
+        <div id="debug-errors"></div>
     </div>
 
     <script>
-        // Simple loading script
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('VibeChat Desktop loading...');
-
-            // Simulate loading process
-            setTimeout(() => {
-                document.querySelector('.status').textContent = 'Initializing application...';
-            }, 1000);
-
-            setTimeout(() => {
-                document.querySelector('.status').textContent = 'Connecting to services...';
-            }, 2000);
-
-            // In a real app, this would redirect to the React app
-            // For now, we'll just show a message
-            setTimeout(() => {
-                document.querySelector('.status').textContent = 'Ready! Click to continue...';
-                document.body.style.cursor = 'pointer';
-                document.body.onclick = () => {
-                    alert('VibeChat Desktop would now load the main application.\n\nIn production, this would redirect to the React app.');
-                };
-            }, 3000);
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            showError('JavaScript Error: ' + event.error.message);
+            logDebug('ERROR: ' + event.error.message + ' at ' + event.filename + ':' + event.lineno);
         });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            showError('Promise Error: ' + event.reason.message || event.reason);
+            logDebug('PROMISE_ERROR: ' + (event.reason.message || event.reason));
+        });
+
+        // Debug logging system
+        let debugLogs = [];
+        function logDebug(message) {
+            debugLogs.push(new Date().toISOString() + ': ' + message);
+            if (debugLogs.length > 50) debugLogs.shift(); // Keep last 50 logs
+
+            const debugPanel = document.getElementById('debug-panel');
+            const debugStatus = document.getElementById('debug-status');
+            if (debugPanel && debugStatus) {
+                debugPanel.style.display = 'block';
+                debugStatus.textContent = message;
+            }
+
+            console.log('[VibeChat Debug]', message);
+        }
+
+        // Show error function
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            const statusDiv = document.getElementById('status');
+            if (errorDiv && statusDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                statusDiv.textContent = 'Error occurred - check details below';
+            }
+        }
+
+        // Update status function
+        function updateStatus(message) {
+            const statusDiv = document.getElementById('status');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+            }
+        }
+
+        // Initialize application
+        logDebug('Starting VibeChat Desktop initialization');
+
+        // Simulate loading process with detailed logging
+        setTimeout(() => {
+            updateStatus('Initializing application...');
+            logDebug('Application initialization started');
+        }, 500);
+
+        setTimeout(() => {
+            updateStatus('Connecting to services...');
+            logDebug('Connecting to backend services');
+        }, 1500);
+
+        setTimeout(() => {
+            updateStatus('Loading interface...');
+            logDebug('Loading React interface');
+        }, 2500);
+
+        // Load React app
+        setTimeout(() => {
+            loadReactApp();
+        }, 3000);
+
+        function loadReactApp() {
+            logDebug('Attempting to load React application');
+
+            try {
+                // Hide loading screen
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.style.display = 'none';
+                }
+
+                // Show body
+                document.body.classList.add('loaded');
+
+                // Load React CSS
+                logDebug('Loading React CSS');
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = './build/static/css/main.9e2fc350.css';
+                link.onload = () => logDebug('React CSS loaded successfully');
+                link.onerror = () => {
+                    logDebug('Failed to load React CSS');
+                    showError('Failed to load application styles');
+                };
+                document.head.appendChild(link);
+
+                // Load React JS
+                logDebug('Loading React JavaScript');
+                const script = document.createElement('script');
+                script.src = './build/static/js/main.0d2cc4f3.js';
+                script.onload = () => {
+                    logDebug('React app loaded successfully');
+                    updateStatus('Application ready');
+                };
+                script.onerror = (error) => {
+                    logDebug('Failed to load React app: ' + error.message);
+                    showError('Failed to load VibeChat application. Please restart the application.');
+                };
+                document.body.appendChild(script);
+
+            } catch (error) {
+                logDebug('Exception during React app loading: ' + error.message);
+                showError('Critical error loading application: ' + error.message);
+            }
+        }
+
+        // Handle Electron-specific features
+        if (typeof window !== 'undefined' && window.electron) {
+            logDebug('Running in Electron environment');
+
+            // Setup Electron API
+            window.electronAPI = window.electron;
+            logDebug('Electron API initialized');
+
+            // Enable debug mode in development
+            if (window.electron.isDev) {
+                logDebug('Development mode detected');
+                document.getElementById('debug-panel').style.display = 'block';
+            }
+        } else {
+            logDebug('Running in browser environment');
+        }
+
+        // Periodic health check
+        setInterval(() => {
+            if (document.body.classList.contains('loaded')) {
+                logDebug('Health check: Application running normally');
+            }
+        }, 30000);
+
+        // Auto-save functionality
+        let autoSaveTimer;
+        function scheduleAutoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                logDebug('Auto-saving application data');
+                // Implement auto-save logic here
+            }, 5000); // Auto-save every 5 seconds of inactivity
+        }
+
+        // Monitor user activity for auto-save
+        ['mousedown', 'keydown', 'scroll'].forEach(event => {
+            document.addEventListener(event, scheduleAutoSave, true);
+        });
+
+        logDebug('VibeChat Desktop initialization complete');
     </script>
 </body>
 </html>

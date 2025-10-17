@@ -33,6 +33,11 @@ import {
   Group as GroupIcon,
   Visibility as EyeIcon,
   Refresh as RefreshIcon,
+  Link as LinkIcon,
+  Schedule as ScheduleIcon,
+  Timer as TimerIcon,
+  ContentCopy as CopyIcon,
+  Share as ShareIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
@@ -304,6 +309,25 @@ const RoomList: React.FC = () => {
                       </Typography>
                     </Box>
 
+                    {/* Link Expiration Info */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                      {room.permanentLink ? (
+                        <>
+                          <LinkIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                          <Typography variant="body2" color="success.main">
+                            Permanent Link
+                          </Typography>
+                        </>
+                      ) : (
+                        <>
+                          <TimerIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                          <Typography variant="body2" color="warning.main">
+                            Expires in {room.linkExpirationDays || 30} days
+                          </Typography>
+                        </>
+                      )}
+                    </Box>
+
                     <Typography variant="caption" color="text.secondary">
                       Created {formatDate(room.createdAt)}
                     </Typography>
@@ -328,9 +352,28 @@ const RoomList: React.FC = () => {
                           <EyeIcon />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Share Room Link">
+                        <IconButton
+                          size="small"
+                          onClick={() => {
+                            const shareText = `Join my VibeChat room "${room.name}"!\nRoom Code: ${room.roomCode}\nLink: ${room.roomUrl}`;
+                            if (navigator.share) {
+                              navigator.share({
+                                title: 'VibeChat Room',
+                                text: shareText,
+                                url: room.roomUrl
+                              });
+                            } else {
+                              navigator.clipboard.writeText(shareText);
+                            }
+                          }}
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
 
-                    <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                       <Tooltip title="Copy Room Code">
                         <IconButton
                           size="small"
@@ -343,6 +386,23 @@ const RoomList: React.FC = () => {
                           </Typography>
                         </IconButton>
                       </Tooltip>
+
+                      {/* Link Status Indicator */}
+                      {room.permanentLink ? (
+                        <Chip
+                          label="Permanent"
+                          size="small"
+                          color="success"
+                          variant="outlined"
+                        />
+                      ) : (
+                        <Chip
+                          label={`${room.linkExpirationDays || 30}d`}
+                          size="small"
+                          color="warning"
+                          variant="outlined"
+                        />
+                      )}
                     </Box>
                   </CardActions>
                 </Card>

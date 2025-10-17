@@ -28,6 +28,12 @@ public class UserService {
     @Autowired
     private EmailVerificationService emailVerificationService;
 
+    @Autowired
+    private PreMadeServerService preMadeServerService;
+
+    @Autowired
+    private JwtService jwtService;
+
     public UserDTO.UserInfo createUser(UserDTO.RegisterRequest request) {
         // Check if username or email already exists
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -90,7 +96,7 @@ public class UserService {
             throw new RuntimeException("User account is disabled");
         }
 
-        // Generate JWT token here (will implement in AuthService)
+        // Generate JWT token
         String token = generateJwtToken(user);
 
         UserDTO.UserInfo userInfo = mapToUserInfo(user);
@@ -148,6 +154,13 @@ public class UserService {
         user.setVerificationToken(null); // Clear the token after verification
         userRepository.save(user);
 
+        // Auto-assign user to a pre-made server after email verification
+        try {
+            preMadeServerService.assignUserToServer(user);
+        } catch (Exception e) {
+            System.err.println("Failed to assign user to pre-made server: " + e.getMessage());
+        }
+
         return true;
     }
 
@@ -182,10 +195,8 @@ public class UserService {
         return token.toString();
     }
 
-    private String generateJwtToken(User user) {
-        // Placeholder for JWT token generation
-        // Will implement properly in AuthService
-        return "jwt-token-" + user.getId();
+    public String generateJwtToken(User user) {
+        return jwtService.generateToken(user);
     }
 
     private UserDTO.UserInfo mapToUserInfo(User user) {
@@ -199,5 +210,9 @@ public class UserService {
                 user.getEmailVerified(),
                 user.getCreatedAt() != null ? user.getCreatedAt().toString() : null
         );
+    }
+
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 }

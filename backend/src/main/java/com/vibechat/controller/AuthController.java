@@ -1,20 +1,28 @@
 package com.vibechat.controller;
 
-import com.vibechat.model.dto.UserDTO;
-import com.vibechat.service.UserService;
-import com.vibechat.service.EmailService;
-import com.vibechat.model.User;
-import com.vibechat.model.repository.UserRepository;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vibechat.model.User;
+import com.vibechat.model.dto.UserDTO;
+import com.vibechat.model.repository.UserRepository;
+import com.vibechat.service.EmailService;
+import com.vibechat.service.UserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -54,27 +62,59 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserDTO.LoginRequest request) {
         try {
-            Optional<UserDTO.AuthResponse> authResponse = userService.authenticateUser(request);
+            // Custom owner authentication - only allow specific credentials
+            if ("AdminT".equals(request.getUsername()) &&
+                "Torey991200@##@@##".equals(request.getPassword())) {
 
-            if (authResponse.isEmpty()) {
-                Map<String, Object> error = new HashMap<>();
-                error.put("success", false);
-                error.put("message", "Invalid username or password");
+                // Create or get the admin user
+                Optional<User> existingUser = userService.findByUsername("AdminT");
+                User adminUser;
 
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+                if (existingUser.isPresent()) {
+                    adminUser = existingUser.get();
+                } else {
+                    // Create the admin user
+                    UserDTO.RegisterRequest registerRequest = new UserDTO.RegisterRequest();
+                    registerRequest.setUsername("AdminT");
+                    registerRequest.setEmail("admin@vibechat.com");
+                    registerRequest.setPassword("Torey991200@##@@##");
+                    registerRequest.setFullName("VibeChat Administrator");
+
+                    UserDTO.UserInfo userInfo = userService.createUser(registerRequest);
+                    adminUser = userService.findByUsername("AdminT").orElseThrow();
+                }
+
+                // Mark as verified and superuser
+                adminUser.setEmailVerified(true);
+                adminUser.setIsSuperuser(true);
+                adminUser.setDeveloperMode(true);
+                userService.getUserRepository().save(adminUser);
+
+                // Generate JWT token
+                String token = userService.generateJwtToken(adminUser);
+
+                UserDTO.UserInfo userInfo = userService.getUserInfo(adminUser);
+                UserDTO.AuthResponse authResponse = new UserDTO.AuthResponse(token, 864000000L, userInfo);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("success", true);
+                response.put("message", "Owner login successful");
+                response.put("data", authResponse);
+
+                return ResponseEntity.ok(response);
             }
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Login successful");
-            response.put("data", authResponse.get());
-
-            return ResponseEntity.ok(response);
-
-        } catch (RuntimeException e) {
+            // For any other login attempt, reject it
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", e.getMessage());
+            error.put("message", "Access denied. Only the owner can login.");
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Login failed: " + e.getMessage());
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
