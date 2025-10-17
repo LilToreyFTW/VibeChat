@@ -1,0 +1,2 @@
+specific user IDs are the IDs the AI needs to generate for the users custom created account
+that they can copy and in settings and accessory settings they can go and turn on developer mode and our HTTP server runs API keys and tokens and the HTTP server HOSTS the users Token and if they want the user can create a bot for our app USING their ACCOUNT token OUR AI generates to their account after account creation

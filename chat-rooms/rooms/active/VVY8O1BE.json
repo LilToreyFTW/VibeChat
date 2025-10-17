@@ -1,0 +1,23 @@
+{
+  "id": "room_1760666015897_h043mp420",
+  "code": "VVY8O1BE",
+  "name": "Live Updates",
+  "description": "Stay updated with the latest VibeChat news and features.",
+  "category": "default",
+  "creator": "system",
+  "createdAt": "2025-10-17T01:53:35.897Z",
+  "isActive": true,
+  "maxMembers": 50,
+  "allowBots": true,
+  "isPublic": true,
+  "tags": [
+    "updates",
+    "news"
+  ],
+  "roomImage": null,
+  "settings": {
+    "allowFileUploads": true,
+    "allowScreenShare": false,
+    "moderation": "none"
+  }
+}

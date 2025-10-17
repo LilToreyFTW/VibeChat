@@ -1,0 +1,23 @@
+{
+  "id": "room_1760666015896_hhsoa206i",
+  "code": "56X33WTS",
+  "name": "General Chat",
+  "description": "General discussion room for all topics.",
+  "category": "default",
+  "creator": "system",
+  "createdAt": "2025-10-17T01:53:35.896Z",
+  "isActive": true,
+  "maxMembers": 50,
+  "allowBots": true,
+  "isPublic": true,
+  "tags": [
+    "general",
+    "discussion"
+  ],
+  "roomImage": null,
+  "settings": {
+    "allowFileUploads": true,
+    "allowScreenShare": false,
+    "moderation": "none"
+  }
+}

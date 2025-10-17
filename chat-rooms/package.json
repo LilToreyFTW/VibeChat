@@ -1,0 +1,40 @@
+{
+  "name": "vibechat-room-server",
+  "version": "1.0.0",
+  "description": "VibeChat Room Management Server - Handles room creation, serving, and real-time chat",
+  "main": "room-server.js",
+  "scripts": {
+    "start": "node room-server.js",
+    "dev": "nodemon room-server.js",
+    "test": "echo 'No tests defined yet'",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "morgan": "^1.10.0",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "@types/sockjs-client": "^1.5.4",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "chat",
+    "websocket",
+    "real-time",
+    "room-management",
+    "express"
+  ],
+  "author": "VibeChat Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vibechat/room-server"
+  }
+}

@@ -1,0 +1,47 @@
+👋 Meet the VibeChat Creators! 👋
+
+We're the passionate team behind VibeChat, working hard to create the best real-time communication platform for everyone!
+
+🚀 **Our Mission:**
+"Building bridges through seamless, real-time communication that brings people together, regardless of distance or device."
+
+💻 **What We Built:**
+• **Full-Stack Architecture**: React frontend + Spring Boot backend + Node.js room server
+• **Real-Time Messaging**: WebSocket-powered instant communication
+• **Cross-Platform Support**: Web, desktop (Electron), and mobile responsive
+• **Room Management**: Custom rooms with unique URLs and settings
+• **Admin Control System**: Complete server management and monitoring
+• **Security First**: End-to-end security with audit trails
+
+🎯 **Key Features We're Proud Of:**
+✅ Custom room creation with AI-generated URLs
+✅ Real-time messaging with presence indicators
+✅ Room customization and image uploads
+✅ Desktop client with native OS integration
+✅ Owner control panel for server administration
+✅ Mobile-responsive design for all devices
+✅ WebSocket-based real-time updates
+✅ File upload and sharing capabilities
+
+🔧 **Technology Stack:**
+• **Frontend**: React, TypeScript, Material-UI, Zustand
+• **Backend**: Java Spring Boot, WebSocket (STOMP)
+• **Room Server**: Node.js, Express, WebSocket
+• **Desktop**: Electron with auto-updates
+• **Database**: MySQL with JPA/Hibernate
+• **Real-time**: WebSocket over SockJS/STOMP
+
+🌟 **Our Vision:**
+We envision a world where distance doesn't matter - where friends, family, colleagues, and communities can connect instantly and effortlessly. VibeChat is our contribution to making that vision a reality.
+
+📞 **Get In Touch:**
+• **Email**: creators@vibechat.com
+• **GitHub**: https://github.com/vibechat
+• **Website**: https://vibechat.com
+• **Discord**: Join our developer community
+
+🙏 **Thank You:**
+Thank you for choosing VibeChat! We're constantly working to improve and add new features. Your feedback helps us make VibeChat even better.
+
+- The VibeChat Development Team
+  (Building the future of real-time communication, one message at a time!)

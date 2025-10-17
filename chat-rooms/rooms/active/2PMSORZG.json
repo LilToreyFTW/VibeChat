@@ -1,0 +1,23 @@
+{
+  "id": "room_1760666015895_8dshgrib7",
+  "code": "2PMSORZG",
+  "name": "Welcome Room",
+  "description": "Welcome to VibeChat! This is where new users get started.",
+  "category": "default",
+  "creator": "system",
+  "createdAt": "2025-10-17T01:53:35.895Z",
+  "isActive": true,
+  "maxMembers": 50,
+  "allowBots": true,
+  "isPublic": true,
+  "tags": [
+    "welcome",
+    "getting-started"
+  ],
+  "roomImage": null,
+  "settings": {
+    "allowFileUploads": true,
+    "allowScreenShare": false,
+    "moderation": "none"
+  }
+}

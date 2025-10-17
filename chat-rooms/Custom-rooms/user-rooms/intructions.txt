@@ -1,0 +1,7 @@
+When users open our app after sign up to our app 
+they can create custom chat rooms and get a generated link our app with an AI generates and is run inside of a HTTP server to read all live rooms created etc
+those users in their custom chat rooms can right click on their chat room and a drop down tabs of settings do inside of their own room 
+
+Change the picture of their Room image 
+Invite users: custom generated link and the AI needs to generate it like this https://CoreVibeChatrooms.com/########
+kinda like discord in a way 

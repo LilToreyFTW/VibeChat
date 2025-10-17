@@ -1,0 +1,23 @@
+{
+  "id": "room_1760666015897_ez920pufl",
+  "code": "E2FQZZZI",
+  "name": "App Creators",
+  "description": "Meet the creators and developers of VibeChat.",
+  "category": "default",
+  "creator": "system",
+  "createdAt": "2025-10-17T01:53:35.897Z",
+  "isActive": true,
+  "maxMembers": 50,
+  "allowBots": true,
+  "isPublic": true,
+  "tags": [
+    "creators",
+    "developers"
+  ],
+  "roomImage": null,
+  "settings": {
+    "allowFileUploads": true,
+    "allowScreenShare": false,
+    "moderation": "none"
+  }
+}

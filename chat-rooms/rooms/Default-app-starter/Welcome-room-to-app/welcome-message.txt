@@ -1,0 +1,38 @@
+🎉 Welcome to VibeChat! 🎉
+
+Hello and welcome to VibeChat - your new favorite place for real-time conversations!
+
+🚀 **Getting Started:**
+• Create your own custom rooms with unique codes
+• Join existing rooms using room codes
+• Customize your experience with room settings
+• Connect via web browser or desktop app
+
+📋 **Quick Tips:**
+• Room URLs look like: https://CoreVibeChatrooms.com/ABC12345
+• Right-click in rooms for settings and customization
+• Share room links with friends to invite them
+• All rooms support real-time messaging
+
+💡 **Features:**
+• Real-time messaging with WebSocket technology
+• Room customization and image uploads
+• User presence indicators
+• Message history and persistence
+• Mobile-responsive design
+
+🎯 **Room Categories:**
+• 💬 General Chat - Everyday conversations
+• 🎮 Gaming - Gaming discussions and meetups
+• 📚 Study Groups - Collaborative learning
+• 💼 Workspace - Professional collaboration
+• 🎉 Social Hub - Events and social gatherings
+
+🔗 **Useful Links:**
+• Main App: https://your-vibechat-app.com
+• Desktop Client: Download from our website
+• Support: help@vibechat.com
+
+Have fun chatting! If you need help, check out our help section or ask in the community rooms.
+
+- The VibeChat Team
