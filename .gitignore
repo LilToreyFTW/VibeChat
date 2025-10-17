@@ -1,0 +1,4 @@
+clients_chat_exe/dist/win-unpacked/VibeChat Desktop.exe
+clients_chat_exe/node_modules/electron/dist/electron.exe
+frontend/node_modules/.cache/default-development/0.pack
+python-service/dist/VibeChat-AI-Service/_internal/torch/lib/torch_cpu.dll
