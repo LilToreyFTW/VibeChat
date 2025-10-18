@@ -5,8 +5,240 @@ const os = require('os');
 const crypto = require('crypto');
 const https = require('https');
 const http = require('http');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const isDev = process.env.NODE_ENV === 'development';
+
+// Service Manager for running backend services invisibly
+class ServiceManager {
+    constructor() {
+        this.services = new Map();
+        this.isWindows = process.platform === 'win32';
+        this.serviceStatus = 'stopped';
+    }
+
+    async startAllServices() {
+        logDebug('Starting all backend services...');
+
+        try {
+            // Start services in order of dependencies
+            await this.startJavaBackend();
+            await this.startChatRooms();
+            await this.startPythonService();
+            await this.startHttpServer();
+
+            this.serviceStatus = 'running';
+            logDebug('All backend services started successfully');
+        } catch (error) {
+            logError('Failed to start backend services: ' + error.message, error.stack);
+            throw error;
+        }
+    }
+
+    async startJavaBackend() {
+        return new Promise((resolve, reject) => {
+            const backendPath = path.join(__dirname, '..', 'backend');
+            const jarPath = path.join(backendPath, 'target', 'vibechat-backend-1.0.0.jar');
+
+            if (!require('fs').existsSync(jarPath)) {
+                logDebug('Java backend JAR not found, skipping...');
+                resolve();
+                return;
+            }
+
+            logDebug('Starting Java backend service...');
+
+            const javaProcess = spawn('java', ['-jar', jarPath], {
+                cwd: backendPath,
+                detached: true,
+                stdio: 'ignore',
+                windowsHide: true
+            });
+
+            javaProcess.unref();
+
+            this.services.set('java-backend', {
+                process: javaProcess,
+                port: 8080,
+                url: 'http://localhost:8080'
+            });
+
+            // Wait for service to be ready
+            setTimeout(() => {
+                this.checkServiceHealth('http://localhost:8080/actuator/health', resolve, reject);
+            }, 3000);
+        });
+    }
+
+    async startChatRooms() {
+        return new Promise((resolve, reject) => {
+            const chatRoomsPath = path.join(__dirname, '..', 'chat-rooms');
+
+            if (!require('fs').existsSync(path.join(chatRoomsPath, 'room-server.js'))) {
+                logDebug('Chat rooms server not found, skipping...');
+                resolve();
+                return;
+            }
+
+            logDebug('Starting chat rooms service...');
+
+            const nodeProcess = spawn('node', ['room-server.js'], {
+                cwd: chatRoomsPath,
+                detached: true,
+                stdio: 'ignore',
+                windowsHide: true
+            });
+
+            nodeProcess.unref();
+
+            this.services.set('chat-rooms', {
+                process: nodeProcess,
+                port: 3001,
+                url: 'http://localhost:3001'
+            });
+
+            // Wait for service to be ready
+            setTimeout(() => {
+                this.checkServiceHealth('http://localhost:3001/health', resolve, reject);
+            }, 2000);
+        });
+    }
+
+    async startPythonService() {
+        return new Promise((resolve, reject) => {
+            const pythonServicePath = path.join(__dirname, '..', 'python-service');
+
+            if (!require('fs').existsSync(path.join(pythonServicePath, 'app', 'main.py'))) {
+                logDebug('Python service not found, skipping...');
+                resolve();
+                return;
+            }
+
+            logDebug('Starting Python AI service...');
+
+            // Try to run the Python service directly first
+            const pythonProcess = spawn('python', ['-m', 'uvicorn', 'app.main:app', '--host', '0.0.0.0', '--port', '8000'], {
+                cwd: pythonServicePath,
+                detached: true,
+                stdio: 'ignore',
+                windowsHide: true
+            });
+
+            pythonProcess.unref();
+
+            this.services.set('python-service', {
+                process: pythonProcess,
+                port: 8000,
+                url: 'http://localhost:8000'
+            });
+
+            // Wait for service to be ready
+            setTimeout(() => {
+                this.checkServiceHealth('http://localhost:8000/docs', resolve, reject);
+            }, 5000);
+        });
+    }
+
+    async startHttpServer() {
+        return new Promise((resolve, reject) => {
+            const httpServerPath = path.join(__dirname, '..', 'http_server_files');
+
+            if (!require('fs').existsSync(path.join(httpServerPath, 'server.js'))) {
+                logDebug('HTTP server not found, skipping...');
+                resolve();
+                return;
+            }
+
+            logDebug('Starting HTTP server...');
+
+            const nodeProcess = spawn('node', ['server.js'], {
+                cwd: httpServerPath,
+                detached: true,
+                stdio: 'ignore',
+                windowsHide: true
+            });
+
+            nodeProcess.unref();
+
+            this.services.set('http-server', {
+                process: nodeProcess,
+                port: 8081,
+                url: 'http://localhost:8081'
+            });
+
+            // Wait for service to be ready
+            setTimeout(() => {
+                this.checkServiceHealth('http://localhost:8081/', resolve, reject);
+            }, 2000);
+        });
+    }
+
+    checkServiceHealth(url, resolve, reject) {
+        const http = url.startsWith('https') ? require('https') : require('http');
+
+        const req = http.get(url, (res) => {
+            if (res.statusCode >= 200 && res.statusCode < 400) {
+                logDebug(`Service health check passed for ${url}`);
+                resolve();
+            } else {
+                reject(new Error(`Service health check failed: ${res.statusCode}`));
+            }
+        });
+
+        req.on('error', (err) => {
+            logDebug(`Service health check error for ${url}: ${err.message}`);
+            // Don't reject here, just resolve - service might still be starting
+            resolve();
+        });
+
+        req.setTimeout(5000, () => {
+            req.destroy();
+            resolve(); // Timeout, but don't fail the startup
+        });
+    }
+
+    async stopAllServices() {
+        logDebug('Stopping all backend services...');
+
+        for (const [name, service] of this.services) {
+            try {
+                if (service.process && !service.process.killed) {
+                    if (this.isWindows) {
+                        // On Windows, kill the process tree
+                        exec(`taskkill /pid ${service.process.pid} /T /F`, (error) => {
+                            if (error) {
+                                logDebug(`Failed to kill ${name}: ${error.message}`);
+                            } else {
+                                logDebug(`Killed ${name} service`);
+                            }
+                        });
+                    } else {
+                        service.process.kill('SIGTERM');
+                    }
+                }
+            } catch (error) {
+                logDebug(`Error stopping ${name}: ${error.message}`);
+            }
+        }
+
+        this.services.clear();
+        this.serviceStatus = 'stopped';
+    }
+
+    getServiceStatus() {
+        return {
+            status: this.serviceStatus,
+            services: Array.from(this.services.entries()).map(([name, service]) => ({
+                name,
+                port: service.port,
+                url: service.url,
+                running: service.process && !service.process.killed
+            }))
+        };
+    }
+}
+
+// Global service manager instance
+const serviceManager = new ServiceManager();
 
 // AI Updater System
 class AIUpdater {
@@ -1119,6 +1351,10 @@ app.whenReady().then(async () => {
     // Initialize auto-save manager
     autoSaveManager.start();
 
+    // Start all backend services invisibly
+    logDebug('Initializing backend services...');
+    await serviceManager.startAllServices();
+
     // Create main window
     createWindow();
 
@@ -1126,9 +1362,14 @@ app.whenReady().then(async () => {
 
   } catch (error) {
     logError('Application initialization failed: ' + error.message, error.stack);
-    dialog.showErrorBox('Initialization Error',
-      'Failed to initialize VibeChat. Please restart the application.\n\nError: ' + error.message);
-    app.quit();
+
+    // Show user-friendly error but don't quit - let them try to use the app anyway
+    if (mainWindow) {
+      mainWindow.webContents.send('service-startup-error', error.message);
+    }
+
+    // Still create the window so users can use the app even if services fail to start
+    createWindow();
   }
 
   app.on('activate', () => {
@@ -1146,8 +1387,16 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', () => {
+app.on('before-quit', async () => {
   isQuitting = true;
+
+  // Stop all backend services before quitting
+  try {
+    await serviceManager.stopAllServices();
+    logDebug('All backend services stopped successfully');
+  } catch (error) {
+    logError('Error stopping services during shutdown: ' + error.message);
+  }
 });
 
 // Handle app being launched with a room URL (macOS)
@@ -1170,6 +1419,33 @@ app.on('web-contents-created', (event, contents) => {
     event.preventDefault();
     shell.openExternal(navigationUrl);
   });
+});
+
+// Service Manager IPC handlers
+ipcMain.handle('get-service-status', () => {
+  return serviceManager.getServiceStatus();
+});
+
+ipcMain.handle('restart-services', async () => {
+  try {
+    await serviceManager.stopAllServices();
+    await serviceManager.startAllServices();
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+ipcMain.handle('get-service-logs', () => {
+  // Return recent service-related logs
+  const serviceLogs = debugLogs.filter(log =>
+    log.includes('service') ||
+    log.includes('backend') ||
+    log.includes('Starting') ||
+    log.includes('Stopping')
+  ).slice(-50); // Last 50 service-related logs
+
+  return serviceLogs;
 });
 
 process.on('uncaughtException', (error) => {

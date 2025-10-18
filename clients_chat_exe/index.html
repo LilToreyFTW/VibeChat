@@ -106,6 +106,7 @@
         <div class="logo">VibeChat</div>
         <div class="spinner"></div>
         <div class="status" id="status">Loading VibeChat Desktop...</div>
+        <div class="service-status" id="service-status" style="font-size: 12px; color: #888; margin-top: 5px;"></div>
         <div class="error" id="error" style="display: none;"></div>
     </div>
 
@@ -247,11 +248,82 @@
                 logDebug('Development mode detected');
                 document.getElementById('debug-panel').style.display = 'block';
             }
+
+            // Setup service status monitoring
+            setupServiceStatusMonitoring();
         } else {
             logDebug('Running in browser environment');
         }
 
         // Periodic health check
+
+        // Service Status Monitoring Functions
+        function setupServiceStatusMonitoring() {
+            logDebug('Setting up service status monitoring');
+
+            // Listen for service startup errors
+            window.electronAPI.onServiceStartupError((error) => {
+                logDebug('Service startup error received: ' + error);
+                showServiceError(error);
+            });
+
+            // Update service status every 5 seconds
+            setInterval(updateServiceStatus, 5000);
+
+            // Initial status check
+            updateServiceStatus();
+        }
+
+        async function updateServiceStatus() {
+            try {
+                const status = await window.electronAPI.getServiceStatus();
+                updateServiceStatusUI(status);
+            } catch (error) {
+                logDebug('Error getting service status: ' + error.message);
+            }
+        }
+
+        function updateServiceStatusUI(status) {
+            const statusElement = document.getElementById('service-status');
+            if (!statusElement) return;
+
+            const services = status.services || [];
+            const runningServices = services.filter(s => s.running);
+
+            if (status.status === 'running' && runningServices.length > 0) {
+                statusElement.innerHTML = `
+                    <div class="service-status-indicator" style="color: #10b981; display: flex; align-items: center; gap: 8px;">
+                        <div class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></div>
+                        <span>Services: ${runningServices.length}/${services.length} running</span>
+                    </div>
+                `;
+                statusElement.title = `Running: ${runningServices.map(s => s.name).join(', ')}`;
+            } else {
+                statusElement.innerHTML = `
+                    <div class="service-status-indicator" style="color: #f59e0b; display: flex; align-items: center; gap: 8px;">
+                        <div class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b;"></div>
+                        <span>Services: Starting...</span>
+                    </div>
+                `;
+                statusElement.title = 'Backend services are starting up';
+            }
+        }
+
+        function showServiceError(error) {
+            const statusElement = document.getElementById('service-status');
+            if (!statusElement) return;
+
+            statusElement.innerHTML = `
+                <div class="service-status-indicator" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+                    <div class="status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></div>
+                    <span>Services: Error</span>
+                </div>
+            `;
+            statusElement.title = `Service error: ${error}`;
+
+            // Show error notification
+            showError(`Backend services failed to start: ${error}`);
+        }
         setInterval(() => {
             if (document.body.classList.contains('loaded')) {
                 logDebug('Health check: Application running normally');

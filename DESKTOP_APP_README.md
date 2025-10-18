@@ -8,10 +8,11 @@ This guide provides complete instructions for building, deploying, and maintaini
 
 ## 📦 **What's Included**
 
-✅ **Desktop Installer** - Windows NSIS installer (`.exe`)
+✅ **Desktop Installer** - Windows NSIS installer (`.exe`) with embedded services
 ✅ **Auto-Updater System** - Updates served from local HTTP server
 ✅ **Cross-Platform Support** - Windows, macOS, Linux installers
 ✅ **Update Server** - Local HTTP server for hosting updates
+✅ **Backend Services** - Java, Node.js, and Python services included
 ✅ **Build Scripts** - Automated build and deployment process
 
 ---
@@ -20,8 +21,10 @@ This guide provides complete instructions for building, deploying, and maintaini
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                          💻 DESKTOP CLIENT (Electron)                         │
-│  • Native desktop application with auto-updater                              │
+│                    💻 DESKTOP CLIENT (Electron) + SERVICES                   │
+│  • Native desktop application with embedded backend services               │
+│  • Auto-starts Java, Node.js, and Python services invisibly                │
+│  • Users can create/join rooms, use AI features without setup             │
 │  • Cross-platform installer (Windows/macOS/Linux)                           │
 │  • Auto-checks for updates from local server                               │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -33,15 +36,22 @@ This guide provides complete instructions for building, deploying, and maintaini
 │  • REST API for update information                                         │
 │  • Local hosting for complete control                                      │
 └─────────────────────────────────────────────────────────────────────────────┘
-                                       │ HTTP/WebSocket
-                                       ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                          🔧 BACKEND SERVICES                                 │
-│  • Java Spring Boot API server                                             │
-│  • Real-time WebSocket communication                                       │
-│  • Database and authentication                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+## 🎯 **Key Features**
+
+### **Invisible Backend Deployment**
+- **Zero-Configuration Setup** - All services start automatically when the desktop app launches
+- **No Manual Server Setup** - Users don't need to start Java, Node.js, or Python services separately
+- **Background Operation** - All services run invisibly in the background
+- **Service Health Monitoring** - Desktop app monitors and restarts services if needed
+
+### **Complete Feature Set**
+- ✅ **Room Creation & Management** - Users can create and join chat rooms instantly
+- ✅ **Real-time Communication** - WebSocket-based messaging, voice, and video
+- ✅ **AI Features** - Integrated AI chat, suggestions, and moderation
+- ✅ **Cross-Platform** - Works on Windows, macOS, and Linux
+- ✅ **Auto-Updates** - Seamless updates without user intervention
 
 ---
 

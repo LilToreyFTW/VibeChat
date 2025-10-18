@@ -93,15 +93,18 @@ echo.
 echo 📋 Step 7: Summary
 echo ==================================================
 echo ✅ Frontend: Built and ready
-echo ✅ Electron App: Built with installer
+echo ✅ Electron App: Built with installer (includes backend services)
+echo ✅ Backend Services: Java, Node.js, and Python services embedded
 echo ✅ Update Server: Running on http://localhost:3001
 echo ✅ Installers: Available in clients_chat_exe/dist/
 echo ✅ Updates: Served from http://localhost:3001/updates/
 echo.
 echo 🎯 Next Steps:
 echo 1. Install the app using: clients_chat_exe/dist/VibeChat Desktop Setup 1.0.0.exe
-echo 2. Test auto-updates by modifying the app and running this script again
-echo 3. Users can check for updates from within the installed app
+echo 2. The app will automatically start all backend services when launched
+echo 3. Users can create/join rooms, use AI features, etc. without manual setup
+echo 4. Test auto-updates by modifying the app and running this script again
+echo 5. Users can check for updates from within the installed app
 echo.
 echo 📚 See DEPLOYMENT_README.md for full documentation
 echo.
