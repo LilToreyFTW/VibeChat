@@ -7,7 +7,13 @@
     "start": "node update-server.js",
     "update-server": "node update-server.js",
     "test": "echo 'No tests defined'",
-    "build": "echo 'Use build-and-deploy.bat for building'"
+    "build": "echo 'Use build-and-deploy.bat for building'",
+    "dev": "vite",
+    "build:vite": "vite build",
+    "preview": "vite preview",
+    "web:dev": "cd vibechat-web && npm run dev",
+    "web:build": "cd vibechat-web && npm run build",
+    "web:deploy": "cd vibechat-web && npm run deploy"
   },
   "dependencies": {
     "cors": "^2.8.5",
