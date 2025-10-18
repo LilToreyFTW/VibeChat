@@ -9,11 +9,6 @@
       "use": "@vercel/next"
     }
   ],
-  "functions": {
-    "vibechat-web/**/*.tsx": {
-      "runtime": "nodejs20.x"
-    }
-  },
   "routes": [
     {
       "src": "/downloads/(.*)",
