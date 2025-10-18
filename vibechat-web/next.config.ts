@@ -1,19 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Optimize for Vercel deployment
   output: 'standalone',
-  distDir: '.next',
   trailingSlash: true,
   images: {
     unoptimized: true,
   },
-  // Enable compression
+  // Enable compression and optimization
   compress: true,
-  // Optimize for production
   swcMinify: true,
-  // Generate source maps for debugging (remove in production if needed)
+  // Disable source maps in production for better performance
   productionBrowserSourceMaps: false,
-  // Headers for better caching
+  // Experimental features for better Vercel compatibility
+  experimental: {
+    optimizePackageImports: ['framer-motion'],
+  },
+  // Headers for better caching and security
   async headers() {
     return [
       {
@@ -24,6 +27,29 @@ const nextConfig: NextConfig = {
             value: 'public, max-age=31536000, immutable',
           },
         ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+        ],
+      },
+    ];
+  },
+  // Redirects for better SEO and user experience
+  async redirects() {
+    return [
+      {
+        source: '/web',
+        destination: '/',
+        permanent: true,
       },
     ];
   },

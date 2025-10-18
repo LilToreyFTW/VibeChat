@@ -6,9 +6,14 @@ npm-debug.log*
 .next/
 out/
 
-# Production
-build
-dist
+# Production builds from other projects
+build/
+dist/
+
+# Python executables and Windows DLLs
+*.exe
+*.dll
+*.pyd
 
 # Misc
 .DS_Store
@@ -41,5 +46,6 @@ coverage
 !package-lock.json
 !next.config.ts
 !postcss.config.mjs
-!tailwind.config.js
 !tsconfig.json
+!vercel.json
+!.nvmrc
