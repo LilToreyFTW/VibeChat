@@ -15,7 +15,6 @@ interface AdminUser {
 
 export const AdminPanelView: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },

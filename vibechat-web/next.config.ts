@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
   },
   // Enable compression and optimization
   compress: true,
-  swcMinify: true,
   // Disable source maps in production for better performance
   productionBrowserSourceMaps: false,
   // Experimental features for better Vercel compatibility

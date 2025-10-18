@@ -2,20 +2,29 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+interface User {
+  id?: string;
+  username?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
+interface ServerStatus {
+  webServer: boolean;
+  chatServer: boolean;
+  roomServer: boolean;
+  desktopApp: boolean;
+}
+
 interface DashboardContextType {
   currentView: string;
   setCurrentView: (view: string) => void;
-  user: any;
-  setUser: (user: any) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
   isConnected: boolean;
   setIsConnected: (connected: boolean) => void;
-  serverStatus: {
-    webServer: boolean;
-    chatServer: boolean;
-    roomServer: boolean;
-    desktopApp: boolean;
-  };
-  setServerStatus: (status: any) => void;
+  serverStatus: ServerStatus;
+  setServerStatus: (status: ServerStatus) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -30,9 +39,9 @@ export const useDashboard = () => {
 
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentView, setCurrentView] = useState('dashboard');
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [serverStatus, setServerStatus] = useState({
+  const [serverStatus, setServerStatus] = useState<ServerStatus>({
     webServer: true,
     chatServer: false,
     roomServer: false,

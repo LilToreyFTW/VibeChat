@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { useDashboard } from './DashboardProvider';
 
 export const SettingsView: React.FC = () => {
-  const { user, setUser } = useDashboard();
   const [settings, setSettings] = useState({
     notifications: true,
     sound: true,
@@ -15,7 +14,7 @@ export const SettingsView: React.FC = () => {
     dataCollection: true,
   });
 
-  const handleSettingChange = (key: string, value: any) => {
+  const handleSettingChange = (key: string, value: string | boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 

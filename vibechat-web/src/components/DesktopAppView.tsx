@@ -64,7 +64,7 @@ export const DesktopAppView: React.FC = () => {
     },
   };
 
-  const handleDownload = async (platform: string) => {
+  const handleDownload = async () => {
     setIsDownloading(true);
     setDownloadProgress(0);
 

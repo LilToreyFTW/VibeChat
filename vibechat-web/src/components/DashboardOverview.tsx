@@ -5,7 +5,7 @@ import { useDashboard } from './DashboardProvider';
 import { motion } from 'framer-motion';
 
 export const DashboardOverview: React.FC = () => {
-  const { serverStatus, user } = useDashboard();
+  const { serverStatus } = useDashboard();
 
   const stats = [
     {
