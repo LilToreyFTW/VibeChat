@@ -5,6 +5,7 @@ const os = require('os');
 const crypto = require('crypto');
 const https = require('https');
 const http = require('http');
+const express = require('express');
 const { exec, spawn } = require('child_process');
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -299,6 +300,66 @@ class ServiceManager {
             }))
         };
     }
+}
+
+// Express server for serving the React app
+let expressApp;
+let expressServer;
+
+function setupExpressServer() {
+  expressApp = express();
+
+  // Serve static files from the build directory
+  const buildPath = path.join(__dirname, 'build');
+  expressApp.use(express.static(buildPath));
+
+  // API proxy routes for Electron environment
+  expressApp.use('/api', (req, res) => {
+    // Proxy API requests to the Java backend
+    const targetUrl = `http://localhost:8080${req.path}`;
+    logDebug(`Proxying API request: ${req.method} ${req.path} -> ${targetUrl}`);
+
+    // For now, return mock responses for development
+    if (req.path.includes('/auth/login')) {
+      res.json({
+        success: true,
+        user: {
+          id: '1',
+          username: 'testuser',
+          email: 'test@example.com',
+          role: 'user'
+        },
+        token: 'mock-jwt-token'
+      });
+    } else if (req.path.includes('/rooms')) {
+      res.json({
+        success: true,
+        rooms: [
+          {
+            id: '1',
+            name: 'General Chat',
+            description: 'General discussion room',
+            category: 'general',
+            activeUsers: 5,
+            maxUsers: 100
+          }
+        ]
+      });
+    } else {
+      res.json({ success: true, message: 'Mock API response' });
+    }
+  });
+
+  // Handle client-side routing - serve index.html for all non-API routes
+  expressApp.get('*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+
+  // Start the server on a different port than the backend services
+  const PORT = 3002;
+  expressServer = expressApp.listen(PORT, () => {
+    logDebug(`Express server running on http://localhost:${PORT}`);
+  });
 }
 
 // Global service manager instance
@@ -790,9 +851,9 @@ function createWindow() {
       mainWindow.loadURL('http://localhost:3000');
       mainWindow.webContents.openDevTools();
     } else {
-      logDebug('Loading production file');
-      // In production, load the index.html file
-      mainWindow.loadFile(path.join(__dirname, 'index.html'));
+      logDebug('Loading production React app');
+      // In production, load the React app served by Express
+      mainWindow.loadURL('http://localhost:3002');
     }
   } catch (error) {
     logError('Failed to load application content: ' + error.message, error.stack);
@@ -1431,6 +1492,9 @@ app.whenReady().then(async () => {
 
     // Initialize auto-save manager
     autoSaveManager.start();
+
+    // Start Express server for React app
+    setupExpressServer();
 
     // Start all backend services invisibly
     logDebug('Initializing backend services...');
