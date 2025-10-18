@@ -123,8 +123,7 @@ export const DashboardOverview: React.FC = () => {
                   <p className="text-3xl font-bold text-white">{stat.value}</p>
                 </div>
                 <div className={`text-sm font-medium ${
-                  stat.changeType === 'positive' ? 'text-green-400' :
-                  stat.changeType === 'negative' ? 'text-red-400' : 'text-gray-400'
+                  stat.changeType === 'positive' ? 'text-green-400' : 'text-gray-400'
                 }`}>
                   {stat.change}
                 </div>

@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useDashboard } from './DashboardProvider';
 
 export const SettingsView: React.FC = () => {
   const [settings, setSettings] = useState({
