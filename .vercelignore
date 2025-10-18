@@ -3,6 +3,8 @@
 !/vibechat-web/
 # Keep the root vercel.json for configuration
 !vercel.json
+# Keep .nvmrc for Node.js version specification
+!.nvmrc
 # Ignore other service directories that might confuse the build
 /backend/
 /frontend/
@@ -12,3 +14,8 @@
 /http_server_files/
 /gui_owner/
 /OWNER_SERVER_CONTROL/
+# Also ignore build artifacts from other projects
+build/
+dist/
+*.exe
+*.jar
