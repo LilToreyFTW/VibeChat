@@ -315,23 +315,53 @@ function setupExpressServer() {
 
   // API proxy routes for Electron environment
   expressApp.use('/api', (req, res) => {
-    // Proxy API requests to the Java backend
-    const targetUrl = `http://localhost:8080${req.path}`;
-    logDebug(`Proxying API request: ${req.method} ${req.path} -> ${targetUrl}`);
+    logDebug(`API Request: ${req.method} ${req.path}`);
 
-    // For now, return mock responses for development
-    if (req.path.includes('/auth/login')) {
-      res.json({
-        success: true,
-        user: {
-          id: '1',
-          username: 'testuser',
-          email: 'test@example.com',
-          role: 'user'
-        },
-        token: 'mock-jwt-token'
-      });
-    } else if (req.path.includes('/rooms')) {
+    // Handle authentication endpoints
+    if (req.path.includes('/auth/login') && req.method === 'POST') {
+      const { username, password } = req.body || {};
+      if (username && password) {
+        res.json({
+          success: true,
+          user: {
+            id: '1',
+            username: username,
+            email: `${username}@example.com`,
+            role: 'user',
+            avatar: null,
+            createdAt: new Date().toISOString()
+          },
+          token: 'mock-jwt-token-' + Date.now(),
+          refreshToken: 'mock-refresh-token'
+        });
+      } else {
+        res.status(400).json({ success: false, message: 'Username and password required' });
+      }
+    }
+
+    // Handle user registration
+    else if (req.path.includes('/auth/register') && req.method === 'POST') {
+      const { username, email, password } = req.body || {};
+      if (username && email && password) {
+        res.json({
+          success: true,
+          user: {
+            id: Date.now().toString(),
+            username: username,
+            email: email,
+            role: 'user',
+            avatar: null,
+            createdAt: new Date().toISOString()
+          },
+          message: 'Account created successfully'
+        });
+      } else {
+        res.status(400).json({ success: false, message: 'Username, email, and password required' });
+      }
+    }
+
+    // Handle room endpoints
+    else if (req.path.includes('/rooms') && req.method === 'GET') {
       res.json({
         success: true,
         rooms: [
@@ -340,13 +370,99 @@ function setupExpressServer() {
             name: 'General Chat',
             description: 'General discussion room',
             category: 'general',
+            icon: '💬',
+            color: '#6366f1',
             activeUsers: 5,
-            maxUsers: 100
+            maxUsers: 100,
+            isPrivate: false,
+            owner: 'admin',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: '2',
+            name: 'Gaming Squad',
+            description: 'Gaming discussions and meetups',
+            category: 'gaming',
+            icon: '🎮',
+            color: '#10b981',
+            activeUsers: 12,
+            maxUsers: 50,
+            isPrivate: false,
+            owner: 'gamer123',
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: '3',
+            name: 'Study Group',
+            description: 'Collaborative learning space',
+            category: 'study',
+            icon: '📚',
+            color: '#f59e0b',
+            activeUsers: 8,
+            maxUsers: 25,
+            isPrivate: true,
+            owner: 'studybuddy',
+            createdAt: new Date().toISOString()
           }
         ]
       });
-    } else {
-      res.json({ success: true, message: 'Mock API response' });
+    }
+
+    // Handle room creation
+    else if (req.path.includes('/rooms') && req.method === 'POST') {
+      const { name, description, category, isPrivate } = req.body || {};
+      if (name && description) {
+        res.json({
+          success: true,
+          room: {
+            id: Date.now().toString(),
+            name: name,
+            description: description,
+            category: category || 'general',
+            icon: '💬',
+            color: '#6366f1',
+            activeUsers: 0,
+            maxUsers: 100,
+            isPrivate: isPrivate || false,
+            owner: 'current-user',
+            createdAt: new Date().toISOString(),
+            inviteCode: 'INV-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+          }
+        });
+      } else {
+        res.status(400).json({ success: false, message: 'Name and description required' });
+      }
+    }
+
+    // Handle user profile
+    else if (req.path.includes('/user/profile') && req.method === 'GET') {
+      res.json({
+        success: true,
+        user: {
+          id: '1',
+          username: 'testuser',
+          email: 'test@example.com',
+          role: 'user',
+          avatar: null,
+          createdAt: new Date().toISOString(),
+          stats: {
+            roomsJoined: 3,
+            messagesSent: 156,
+            friendsCount: 12
+          }
+        }
+      });
+    }
+
+    // Default response for other API endpoints
+    else {
+      res.json({
+        success: true,
+        message: 'Mock API response',
+        endpoint: req.path,
+        method: req.method,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
