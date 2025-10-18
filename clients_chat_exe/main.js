@@ -420,8 +420,16 @@ class AIUpdater {
     }
 }
 
-// Auto-updater
-const { autoUpdater } = require('electron-updater');
+// Auto-updater - handle gracefully if not available in packaged app
+let autoUpdater;
+try {
+  const updaterModule = require('electron-updater');
+  autoUpdater = updaterModule.autoUpdater;
+  console.log('✅ electron-updater loaded successfully');
+} catch (error) {
+  console.log('⚠️ electron-updater not available, using custom updater only');
+  autoUpdater = null;
+}
 
 // Global variables
 let mainWindow;
@@ -792,7 +800,7 @@ function createWindow() {
   // Setup application menu
   setupApplicationMenu();
 
-  // Setup auto-updater in production
+  // Setup auto-updater in production (if available)
   if (!isDev) {
     setupAutoUpdater();
   }
@@ -894,7 +902,7 @@ function setupApplicationMenu() {
         {
           label: 'Check for Updates',
           click: () => {
-            if (!isDev) {
+            if (!isDev && autoUpdater) {
               autoUpdater.checkForUpdatesAndNotify();
             } else {
               dialog.showMessageBox(mainWindow, {
@@ -927,85 +935,94 @@ function setupApplicationMenu() {
 }
 
 function setupAutoUpdater() {
-  // Configure auto-updater for local server
-  if (!isDev) {
-    autoUpdater.setFeedURL({
-      provider: 'generic',
-      url: 'http://localhost:3001/updates/',
-      channel: 'latest',
-      useMultipleRangeRequest: false
-    });
+  // Configure auto-updater for local server if available
+  if (!isDev && autoUpdater) {
+    try {
+      autoUpdater.setFeedURL({
+        provider: 'generic',
+        url: 'http://localhost:3001/updates/',
+        channel: 'latest',
+        useMultipleRangeRequest: false
+      });
 
-    // Set up request headers for the generic provider
-    autoUpdater.requestHeaders = {
-      'User-Agent': 'VibeChat-Desktop/' + app.getVersion()
-    };
+      // Set up request headers for the generic provider
+      autoUpdater.requestHeaders = {
+        'User-Agent': 'VibeChat-Desktop/' + app.getVersion()
+      };
+
+      console.log('✅ Auto-updater configured successfully');
+    } catch (error) {
+      console.error('❌ Failed to configure auto-updater:', error);
+      autoUpdater = null;
+    }
   }
 
-  // Auto-updater event listeners
-  autoUpdater.on('checking-for-update', () => {
-    console.log('Checking for updates...');
-    if (mainWindow) {
-      mainWindow.webContents.send('update-status', 'Checking for updates...');
-    }
-  });
-
-  autoUpdater.on('update-available', (info) => {
-    console.log('Update available:', info.version);
-    if (mainWindow) {
-      mainWindow.webContents.send('update-status', `Update available: v${info.version}`);
-    }
-  });
-
-  autoUpdater.on('update-not-available', () => {
-    console.log('No updates available');
-    if (mainWindow) {
-      mainWindow.webContents.send('update-status', 'No updates available');
-    }
-  });
-
-  autoUpdater.on('error', (err) => {
-    console.error('Update error:', err);
-    if (mainWindow) {
-      mainWindow.webContents.send('update-error', err.message);
-    }
-  });
-
-  autoUpdater.on('download-progress', (progressObj) => {
-    console.log('Download progress:', progressObj.percent);
-    if (mainWindow) {
-      mainWindow.webContents.send('update-progress', progressObj);
-    }
-  });
-
-  autoUpdater.on('update-downloaded', (info) => {
-    console.log('Update downloaded:', info.version);
-    if (mainWindow) {
-      mainWindow.webContents.send('update-downloaded', info);
-
-      // Show notification about update
-      const notification = new Notification({
-        title: 'VibeChat Update Ready',
-        body: `Version ${info.version} has been downloaded. Restart to apply.`,
-        icon: path.join(__dirname, 'assets', 'icon.png')
-      });
-
-      notification.on('click', () => {
-        autoUpdater.quitAndInstall();
-      });
-
-      notification.show();
-    }
-  });
-
-  // Check for updates on startup (after a delay)
-  if (!isDev) {
-    setTimeout(() => {
+  // Auto-updater event listeners (only if autoUpdater is available)
+  if (autoUpdater) {
+    autoUpdater.on('checking-for-update', () => {
       console.log('Checking for updates...');
-      autoUpdater.checkForUpdates().catch(err => {
-        console.error('Failed to check for updates:', err);
-      });
-    }, 5000);
+      if (mainWindow) {
+        mainWindow.webContents.send('update-status', 'Checking for updates...');
+      }
+    });
+
+    autoUpdater.on('update-available', (info) => {
+      console.log('Update available:', info.version);
+      if (mainWindow) {
+        mainWindow.webContents.send('update-status', `Update available: v${info.version}`);
+      }
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      console.log('No updates available');
+      if (mainWindow) {
+        mainWindow.webContents.send('update-status', 'No updates available');
+      }
+    });
+
+    autoUpdater.on('error', (err) => {
+      console.error('Update error:', err);
+      if (mainWindow) {
+        mainWindow.webContents.send('update-error', err.message);
+      }
+    });
+
+    autoUpdater.on('download-progress', (progressObj) => {
+      console.log('Download progress:', progressObj.percent);
+      if (mainWindow) {
+        mainWindow.webContents.send('update-progress', progressObj);
+      }
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+      console.log('Update downloaded:', info.version);
+      if (mainWindow) {
+        mainWindow.webContents.send('update-downloaded', info);
+
+        // Show notification about update
+        const notification = new Notification({
+          title: 'VibeChat Update Ready',
+          body: `Version ${info.version} has been downloaded. Restart to apply.`,
+          icon: path.join(__dirname, 'assets', 'icon.png')
+        });
+
+        notification.on('click', () => {
+          autoUpdater.quitAndInstall();
+        });
+
+        notification.show();
+      }
+    });
+
+    // Check for updates on startup (after a delay)
+    if (!isDev) {
+      setTimeout(() => {
+        console.log('Checking for updates...');
+        autoUpdater.checkForUpdates().catch(err => {
+          console.error('Failed to check for updates:', err);
+        });
+      }, 5000);
+    }
   }
 }
 
@@ -1261,7 +1278,7 @@ ipcMain.handle('quit-app', () => {
 
 // Update handlers
 ipcMain.handle('check-for-updates', async () => {
-  if (!isDev) {
+  if (!isDev && autoUpdater) {
     try {
       return await autoUpdater.checkForUpdates();
     } catch (error) {
@@ -1273,7 +1290,7 @@ ipcMain.handle('check-for-updates', async () => {
 });
 
 ipcMain.handle('download-update', async () => {
-  if (!isDev) {
+  if (!isDev && autoUpdater) {
     try {
       await autoUpdater.downloadUpdate();
       return { success: true };
@@ -1286,7 +1303,7 @@ ipcMain.handle('download-update', async () => {
 });
 
 ipcMain.handle('quit-and-install', () => {
-  if (!isDev) {
+  if (!isDev && autoUpdater) {
     autoUpdater.quitAndInstall();
   }
 });

@@ -42,7 +42,10 @@
       "build/**/*",
       "node_modules/**/*",
       "!**/node_modules/@types/**",
-      "!**/node_modules/electron*/**"
+      "!**/node_modules/electron",
+      "!**/node_modules/electron-builder",
+      "!**/node_modules/electron-devtools-installer",
+      "node_modules/electron-updater/**/*"
     ],
     "mac": {
       "category": "public.app-category.social-networking",
