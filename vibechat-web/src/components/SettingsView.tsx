@@ -174,7 +174,7 @@ export const SettingsView: React.FC = () => {
                       </button>
                     ) : item.type === 'select' ? (
                       <select
-                        value={settings[item.key as keyof typeof settings]}
+                        value={String(settings[item.key as keyof typeof settings])}
                         onChange={(e) => handleSettingChange(item.key, e.target.value)}
                         className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
