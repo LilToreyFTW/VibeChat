@@ -36,42 +36,76 @@ class ServiceManager {
 
     async startJavaBackend() {
         return new Promise((resolve, reject) => {
-            const backendPath = path.join(__dirname, '..', 'backend');
+            // In development, look relative to the exe file location
+            // In production, the backend will be in the same directory as the exe
+            let backendPath;
+            if (isDev) {
+                backendPath = path.join(__dirname, '..', 'backend');
+            } else {
+                // In production, backend is in the same directory as the app
+                backendPath = path.join(path.dirname(app.getPath('exe')), 'backend');
+            }
+
             const jarPath = path.join(backendPath, 'target', 'vibechat-backend-1.0.0.jar');
 
             if (!require('fs').existsSync(jarPath)) {
-                logDebug('Java backend JAR not found, skipping...');
+                logDebug(`Java backend JAR not found at ${jarPath}, skipping...`);
+                logDebug('This is normal if Java backend is not needed or not built yet.');
                 resolve();
                 return;
             }
 
-            logDebug('Starting Java backend service...');
+            logDebug(`Starting Java backend service from ${jarPath}...`);
 
-            const javaProcess = spawn('java', ['-jar', jarPath], {
-                cwd: backendPath,
-                detached: true,
-                stdio: 'ignore',
-                windowsHide: true
+            // Check if Java is available
+            const javaProcess = spawn('java', ['-version'], {
+                stdio: 'pipe'
             });
 
-            javaProcess.unref();
-
-            this.services.set('java-backend', {
-                process: javaProcess,
-                port: 8080,
-                url: 'http://localhost:8080'
+            javaProcess.on('error', (error) => {
+                logError('Java runtime not found. Please install Java 17 or later.', error.message);
+                logDebug('Java backend will be skipped. App will work without Java services.');
+                resolve();
             });
 
-            // Wait for service to be ready
-            setTimeout(() => {
-                this.checkServiceHealth('http://localhost:8080/actuator/health', resolve, reject);
-            }, 3000);
+            javaProcess.on('exit', (code) => {
+                if (code === 0) {
+                    // Java is available, start the backend
+                    const backendProcess = spawn('java', ['-jar', jarPath], {
+                        cwd: backendPath,
+                        detached: true,
+                        stdio: 'ignore',
+                        windowsHide: true
+                    });
+
+                    backendProcess.unref();
+
+                    this.services.set('java-backend', {
+                        process: backendProcess,
+                        port: 8080,
+                        url: 'http://localhost:8080'
+                    });
+
+                    // Wait for service to be ready
+                    setTimeout(() => {
+                        this.checkServiceHealth('http://localhost:8080/actuator/health', resolve, reject);
+                    }, 5000);
+                } else {
+                    logError('Java runtime check failed. Java backend will be skipped.');
+                    resolve();
+                }
+            });
         });
     }
 
     async startChatRooms() {
         return new Promise((resolve, reject) => {
-            const chatRoomsPath = path.join(__dirname, '..', 'chat-rooms');
+            let chatRoomsPath;
+            if (isDev) {
+                chatRoomsPath = path.join(__dirname, '..', 'chat-rooms');
+            } else {
+                chatRoomsPath = path.join(path.dirname(app.getPath('exe')), 'chat-rooms');
+            }
 
             if (!require('fs').existsSync(path.join(chatRoomsPath, 'room-server.js'))) {
                 logDebug('Chat rooms server not found, skipping...');
@@ -105,7 +139,12 @@ class ServiceManager {
 
     async startPythonService() {
         return new Promise((resolve, reject) => {
-            const pythonServicePath = path.join(__dirname, '..', 'python-service');
+            let pythonServicePath;
+            if (isDev) {
+                pythonServicePath = path.join(__dirname, '..', 'python-service');
+            } else {
+                pythonServicePath = path.join(path.dirname(app.getPath('exe')), 'python-service');
+            }
 
             if (!require('fs').existsSync(path.join(pythonServicePath, 'app', 'main.py'))) {
                 logDebug('Python service not found, skipping...');
@@ -140,7 +179,12 @@ class ServiceManager {
 
     async startHttpServer() {
         return new Promise((resolve, reject) => {
-            const httpServerPath = path.join(__dirname, '..', 'http_server_files');
+            let httpServerPath;
+            if (isDev) {
+                httpServerPath = path.join(__dirname, '..', 'http_server_files');
+            } else {
+                httpServerPath = path.join(path.dirname(app.getPath('exe')), 'http_server_files');
+            }
 
             if (!require('fs').existsSync(path.join(httpServerPath, 'server.js'))) {
                 logDebug('HTTP server not found, skipping...');

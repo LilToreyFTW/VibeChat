@@ -45,7 +45,11 @@
       "!**/node_modules/electron",
       "!**/node_modules/electron-builder",
       "!**/node_modules/electron-devtools-installer",
-      "node_modules/electron-updater/**/*"
+      "node_modules/electron-updater/**/*",
+      "../backend/**/*",
+      "../chat-rooms/**/*",
+      "../python-service/**/*",
+      "../http_server_files/**/*"
     ],
     "mac": {
       "category": "public.app-category.social-networking",
