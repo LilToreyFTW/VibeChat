@@ -1,0 +1,14 @@
+# Ignore everything except vibechat-web directory for deployment
+/*
+!/vibechat-web/
+# Keep the root vercel.json for configuration
+!vercel.json
+# Ignore other service directories that might confuse the build
+/backend/
+/frontend/
+/chat-rooms/
+/clients_chat_exe/
+/python-service/
+/http_server_files/
+/gui_owner/
+/OWNER_SERVER_CONTROL/

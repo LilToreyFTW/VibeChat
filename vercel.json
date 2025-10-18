@@ -1,8 +1,10 @@
 {
   "version": 2,
+  "buildCommand": "cd vibechat-web && npm install && npm run build",
+  "outputDirectory": "vibechat-web/.next",
   "builds": [
     {
-      "src": "package.json",
+      "src": "vibechat-web/package.json",
       "use": "@vercel/next"
     }
   ],

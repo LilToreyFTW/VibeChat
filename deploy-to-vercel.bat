@@ -20,6 +20,7 @@ echo 📦 Installing dependencies for Next.js app...
 cd vibechat-web
 if errorlevel 1 (
     echo ❌ Failed to navigate to vibechat-web directory
+    cd ..
     pause
     exit /b 1
 )
@@ -44,15 +45,13 @@ if errorlevel 1 (
 
 echo.
 echo 🚀 Deploying to Vercel...
+cd ..
 vercel --prod
 if errorlevel 1 (
     echo ❌ Deployment failed
-    cd ..
     pause
     exit /b 1
 )
-
-cd ..
 echo.
 echo ✅ Deployment completed successfully!
 echo.
