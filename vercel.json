@@ -1,8 +1,11 @@
 {
   "version": 2,
+  "buildCommand": "npm run web:build",
+  "devCommand": "npm run web:dev",
+  "installCommand": "npm install",
   "builds": [
     {
-      "src": "next.config.ts",
+      "src": "vibechat-web/package.json",
       "use": "@vercel/next"
     }
   ],
@@ -30,10 +33,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "src/app/**/*.tsx": {
-      "runtime": "@vercel/node"
-    }
-  }
+  ]
 }

@@ -3,33 +3,45 @@ echo 🚀 Deploying VibeChat Web to Vercel
 echo =================================
 
 echo.
-echo 📦 Building Next.js application...
-cd vibechat-web
+echo 📦 Installing dependencies...
+npm install
 if errorlevel 1 (
-    echo ❌ Failed to navigate to vibechat-web directory
-    pause
-    exit /b 1
-)
-
-npm run build
-if errorlevel 1 (
-    echo ❌ Build failed
-    cd ..
+    echo ❌ Failed to install dependencies
     pause
     exit /b 1
 )
 
 echo.
-echo 🌐 Deploying to Vercel...
-npm run deploy
+echo 🔨 Building Next.js application...
+npm run build
 if errorlevel 1 (
-    echo ❌ Deployment failed
-    cd ..
+    echo ❌ Build failed
     pause
     exit /b 1
 )
 
-cd ..
+echo.
+echo 🌐 Checking Vercel CLI...
+vercel --version >nul 2>&1
+if errorlevel 1 (
+    echo ⚠️  Vercel CLI not found. Installing globally...
+    npm install -g vercel
+    if errorlevel 1 (
+        echo ❌ Failed to install Vercel CLI
+        pause
+        exit /b 1
+    )
+)
+
+echo.
+echo 🚀 Deploying to Vercel...
+vercel --prod
+if errorlevel 1 (
+    echo ❌ Deployment failed
+    pause
+    exit /b 1
+)
+
 echo.
 echo ✅ Deployment completed successfully!
 echo.
@@ -41,4 +53,7 @@ echo 2. Update DNS settings if needed
 echo 3. Test the web version at /web route
 echo 4. Verify desktop app downloads work
 echo.
+echo 🔗 Access your site at: https://your-project-name.vercel.app
+echo.
 pause
+

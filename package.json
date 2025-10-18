@@ -7,7 +7,7 @@
     "start": "node update-server.js",
     "update-server": "node update-server.js",
     "test": "echo 'No tests defined'",
-    "build": "echo 'Use build-and-deploy.bat for building'",
+    "build": "npm run web:build",
     "dev": "vite",
     "build:vite": "vite build",
     "preview": "vite preview",
