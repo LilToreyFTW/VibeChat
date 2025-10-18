@@ -30,7 +30,17 @@ class ServiceManager {
             logDebug('All backend services started successfully');
         } catch (error) {
             logError('Failed to start backend services: ' + error.message, error.stack);
-            throw error;
+
+            // Show user-friendly error message
+            if (mainWindow) {
+                mainWindow.webContents.send('service-startup-error', {
+                    message: 'Some backend services failed to start. The app will continue with limited functionality.',
+                    details: error.message
+                });
+            }
+
+            // Don't throw error, let the app continue without all services
+            logDebug('Continuing app startup despite service failures...');
         }
     }
 
@@ -65,6 +75,16 @@ class ServiceManager {
             javaProcess.on('error', (error) => {
                 logError('Java runtime not found. Please install Java 17 or later.', error.message);
                 logDebug('Java backend will be skipped. App will work without Java services.');
+
+                // Show user-friendly error message in the app
+                if (mainWindow) {
+                    mainWindow.webContents.send('service-error', {
+                        service: 'Java Backend',
+                        message: 'Java runtime not found. The app will work without Java services, but some features may be limited.',
+                        suggestion: 'Please install Java 17 or later from https://adoptium.net/'
+                    });
+                }
+
                 resolve();
             });
 
