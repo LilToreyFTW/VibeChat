@@ -24,7 +24,7 @@ export const SettingsView: React.FC = () => {
       items: [
         {
           label: 'Theme',
-          type: 'select',
+          type: 'select' as const,
           key: 'theme',
           value: settings.theme,
           options: [
@@ -35,7 +35,7 @@ export const SettingsView: React.FC = () => {
         },
         {
           label: 'Language',
-          type: 'select',
+          type: 'select' as const,
           key: 'language',
           value: settings.language,
           options: [
@@ -53,13 +53,13 @@ export const SettingsView: React.FC = () => {
       items: [
         {
           label: 'Enable Notifications',
-          type: 'toggle',
+          type: 'toggle' as const,
           key: 'notifications',
           value: settings.notifications,
         },
         {
           label: 'Sound Effects',
-          type: 'toggle',
+          type: 'toggle' as const,
           key: 'sound',
           value: settings.sound,
         },
@@ -71,7 +71,7 @@ export const SettingsView: React.FC = () => {
       items: [
         {
           label: 'Data Collection',
-          type: 'toggle',
+          type: 'toggle' as const,
           key: 'dataCollection',
           value: settings.dataCollection,
           description: 'Help improve VibeChat by sharing usage data',
@@ -84,7 +84,7 @@ export const SettingsView: React.FC = () => {
       items: [
         {
           label: 'Auto-start on login',
-          type: 'toggle',
+          type: 'toggle' as const,
           key: 'autoStart',
           value: settings.autoStart,
         },
