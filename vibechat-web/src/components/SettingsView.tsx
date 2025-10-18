@@ -17,6 +17,23 @@ export const SettingsView: React.FC = () => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  type SettingItem =
+    | {
+        label: string;
+        type: 'select';
+        key: string;
+        value: string;
+        options: { value: string; label: string; }[];
+        description?: string;
+      }
+    | {
+        label: string;
+        type: 'toggle';
+        key: string;
+        value: boolean;
+        description?: string;
+      };
+
   const settingsSections = [
     {
       title: 'Appearance',
@@ -45,7 +62,7 @@ export const SettingsView: React.FC = () => {
             { value: 'de', label: 'Deutsch' },
           ],
         },
-      ],
+      ] as SettingItem[],
     },
     {
       title: 'Notifications',
@@ -63,7 +80,7 @@ export const SettingsView: React.FC = () => {
           key: 'sound',
           value: settings.sound,
         },
-      ],
+      ] as SettingItem[],
     },
     {
       title: 'Privacy & Data',
@@ -76,7 +93,7 @@ export const SettingsView: React.FC = () => {
           value: settings.dataCollection,
           description: 'Help improve VibeChat by sharing usage data',
         },
-      ],
+      ] as SettingItem[],
     },
     {
       title: 'System',
@@ -88,7 +105,7 @@ export const SettingsView: React.FC = () => {
           key: 'autoStart',
           value: settings.autoStart,
         },
-      ],
+      ] as SettingItem[],
     },
   ];
 
