@@ -23,11 +23,24 @@ class ApiService {
   private client: AxiosInstance;
 
   constructor() {
-    // Detect if running in Electron
+    // Detect if running in Electron or Vercel
     const isElectron = typeof window !== 'undefined' && window.electron;
+    const isVercel = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+
+    let baseURL = '';
+
+    if (process.env.REACT_APP_API_URL) {
+      baseURL = process.env.REACT_APP_API_URL;
+    } else if (isElectron) {
+      baseURL = 'http://localhost:3002/api';
+    } else if (isVercel) {
+      baseURL = '/api';
+    } else {
+      baseURL = 'http://localhost:3002/api'; // Default for development
+    }
 
     this.client = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || (isElectron ? 'http://localhost:3002/api' : 'http://localhost:3002/api'),
+      baseURL,
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',

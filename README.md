@@ -428,6 +428,59 @@ You now have a **complete, production-ready chat platform** that:
 
 ---
 
+## 🚀 **Deployment Guide**
+
+### **Option 1: Vercel (Web Application)**
+```bash
+# Deploy to Vercel (production)
+npm run deploy:vercel
+
+# Deploy to Vercel (preview)
+npm run deploy:vercel:preview
+
+# Manual deployment
+cd vibechat-web && vercel --prod
+```
+
+**Features:**
+- ✅ Account registration and email verification
+- ✅ Vercel API routes for authentication
+- ✅ Modern web interface
+- ✅ Mobile responsive design
+
+### **Option 2: Electron Desktop Application**
+```bash
+# Build for production
+npm run build
+
+# Start development version
+cd clients_chat_exe && npm start
+
+# Install electron dependencies
+cd clients_chat_exe && npm run postinstall
+```
+
+**Features:**
+- ✅ Desktop application with system integration
+- ✅ Local API server with Express
+- ✅ Owner registration system
+- ✅ Email verification with Proton Mail
+- ✅ All premium features
+
+### **Option 3: Local Development**
+```bash
+# Start React development server
+cd vibechat-web && npm run dev
+
+# Start Electron app in development mode
+cd clients_chat_exe && npm run dev
+
+# Start Java backend manually
+cd backend/target && java -jar vibechat-backend-1.0.0.jar
+```
+
+---
+
 ## 📞 **Support & Documentation**
 
 - **📚 Complete Documentation**: Available in each service folder

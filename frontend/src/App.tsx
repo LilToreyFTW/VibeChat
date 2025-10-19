@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+
+// Detect if running in Electron
+const isElectron = typeof window !== 'undefined' && window.electron;
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, useMediaQuery } from '@mui/material';
@@ -229,6 +232,15 @@ function App() {
             <Route
               path="/verify-email"
               element={<EmailVerificationPage />}
+            />
+            <Route
+              path="/auth/verify-success"
+              element={
+                <div style={{ padding: '20px', textAlign: 'center' }}>
+                  <h2>Email Verification</h2>
+                  <p>Redirecting to verification page...</p>
+                </div>
+              }
             />
 
             <Route

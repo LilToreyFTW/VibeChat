@@ -13,7 +13,9 @@
     "preview": "vite preview",
     "web:dev": "cd vibechat-web && npm run dev",
     "web:build": "cd vibechat-web && npm run build",
-    "web:deploy": "cd vibechat-web && npm run deploy"
+    "web:deploy": "cd vibechat-web && npm run deploy",
+    "deploy:vercel": "cd vibechat-web && vercel --prod",
+    "deploy:vercel:preview": "cd vibechat-web && vercel"
   },
   "dependencies": {
     "cors": "^2.8.5",
