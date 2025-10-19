@@ -12,3 +12,5 @@ clients_chat_exe/dist/VibeChat Desktop 1.0.0.exe
 # Ignore app.asar files (large binary application bundles)
 clients_chat_exe/dist/**/resources/app.asar
 **/resources/app.asar
+clients_chat_exe/dist/win-ia32-unpacked/resources/app.asar
+clients_chat_exe/dist/win-unpacked/resources/app.asar
