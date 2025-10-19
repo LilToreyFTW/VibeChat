@@ -1,8 +1,14 @@
 clients_chat_exe/dist/win-unpacked/VibeChat Desktop.exe
-clients_chat_exe/node_modules/electron/dist/electron.exe
+# clients_chat_exe/node_modules/electron/dist/electron.exe
 frontend/node_modules/.cache/default-development/0.pack
 python-service/dist/VibeChat-AI-Service/_internal/torch/lib/torch_cpu.dll
 clients_chat_exe/dist/VibeChat Desktop Setup 1.0.0.exe
 clients_chat_exe/dist/win-ia32-unpacked/VibeChat Desktop.exe
 vibechat-web/public/downloads/VibeChat Desktop Setup 1.0.0.exe
 node_modules
+node_modules
+clients_chat_exe/dist/VibeChat Desktop 1.0.0.exe
+
+# Ignore app.asar files (large binary application bundles)
+clients_chat_exe/dist/**/resources/app.asar
+**/resources/app.asar

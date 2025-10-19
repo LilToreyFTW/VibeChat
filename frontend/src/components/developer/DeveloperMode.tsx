@@ -55,6 +55,7 @@ import {
   PlayArrow as PlayIcon,
   Stop as StopIcon,
   CheckCircle as CheckIcon,
+  AdminPanelSettings as CrownIcon,
 } from '@mui/icons-material';
 import { useAuthStore } from '../../store/authStore';
 
@@ -181,6 +182,35 @@ const DeveloperMode: React.FC = () => {
     }
   };
 
+  const handleOwnerRegistration = async () => {
+    try {
+      setTestResult({ success: true, message: 'Initiating owner registration...', isLoading: true });
+
+      // @ts-ignore - Electron API
+      const result = await window.electronAPI.registerOwner();
+
+      if (result.success) {
+        setTestResult({
+          success: true,
+          message: result.message || 'Owner registration successful!',
+          data: result
+        });
+      } else {
+        setTestResult({
+          success: false,
+          message: result.error || 'Owner registration failed',
+          error: result.error
+        });
+      }
+    } catch (error) {
+      setTestResult({
+        success: false,
+        message: 'Owner registration failed',
+        error: error
+      });
+    }
+  };
+
   return (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
@@ -268,6 +298,16 @@ const DeveloperMode: React.FC = () => {
                     startIcon={<PlayIcon />}
                   >
                     Test Endpoint
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    onClick={handleOwnerRegistration}
+                    startIcon={<CrownIcon />}
+                    sx={{ mt: 2 }}
+                  >
+                    Register as Owner (LilTorey)
                   </Button>
 
                   {testResult && (

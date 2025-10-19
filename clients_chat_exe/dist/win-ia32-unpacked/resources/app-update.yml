@@ -1,4 +1,0 @@
-provider: generic
-url: http://localhost:3001/updates/
-channel: latest
-updaterCacheDirName: vibechat-desktop-updater

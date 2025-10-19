@@ -17,6 +17,9 @@ import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import EmailVerificationPage from './components/auth/EmailVerificationPage';
 
+// Owner Control Components
+import OwnerControl from './pages/OwnerControl';
+
 // Billing Components
 import SubscriptionManager from './components/billing/SubscriptionManager';
 
@@ -116,9 +119,9 @@ const theme = createTheme({
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
@@ -235,6 +238,12 @@ function App() {
                   <SubscriptionManager />
                 </ProtectedRoute>
               }
+            />
+
+            {/* Owner Control Route */}
+            <Route
+              path="/owner"
+              element={<OwnerControl />}
             />
 
             {/* Main Discord Interface */}

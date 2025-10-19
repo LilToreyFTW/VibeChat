@@ -309,13 +309,29 @@ let expressServer;
 function setupExpressServer() {
   expressApp = express();
 
+  // Parse JSON bodies with error handling
+  expressApp.use(express.json({
+    limit: '10mb',
+    strict: false
+  }));
+  expressApp.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+  // Error handling for JSON parsing
+  expressApp.use((err: any, req: any, res: any, next: any) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+      logDebug('JSON parsing error:', err.message);
+      return res.status(400).json({ success: false, message: 'Invalid JSON format' });
+    }
+    next();
+  });
+
   // Serve static files from the build directory
   const buildPath = path.join(__dirname, 'build');
   expressApp.use(express.static(buildPath));
 
   // API proxy routes for Electron environment
   expressApp.use('/api', (req, res) => {
-    logDebug(`API Request: ${req.method} ${req.path}`);
+    logDebug(`API Request: ${req.method} ${req.path} - Body: ${JSON.stringify(req.body)} - Content-Type: ${req.headers['content-type']}`);
 
     // Handle authentication endpoints
     if (req.path.includes('/auth/login') && req.method === 'POST') {
@@ -341,14 +357,17 @@ function setupExpressServer() {
 
     // Handle user registration
     else if (req.path.includes('/auth/register') && req.method === 'POST') {
-      const { username, email, password } = req.body || {};
-      if (username && email && password) {
+      logDebug(`Registration request received. Raw body: ${JSON.stringify(req.body)}, Headers: ${JSON.stringify(req.headers)}`);
+      const { username, email, password, fullName } = req.body || {};
+      logDebug(`Parsed registration data: username=${username}, email=${email}, password=${password}, fullName=${fullName}`);
+      if (username && email && password && fullName) {
         res.json({
           success: true,
-          user: {
+          data: {
             id: Date.now().toString(),
             username: username,
             email: email,
+            fullName: fullName,
             role: 'user',
             avatar: null,
             createdAt: new Date().toISOString()
@@ -356,8 +375,85 @@ function setupExpressServer() {
           message: 'Account created successfully'
         });
       } else {
-        res.status(400).json({ success: false, message: 'Username, email, and password required' });
+        res.status(400).json({ success: false, message: 'Username, email, password, and full name required' });
       }
+    }
+
+    // Handle owner verification email sending
+    else if (req.path.includes('/auth/send-owner-verification') && req.method === 'POST') {
+      logDebug(`Owner verification email request: ${JSON.stringify(req.body)}`);
+      const { email, username, verificationToken } = req.body || {};
+
+      if (email && username && verificationToken) {
+        // In a real implementation, this would send an actual email
+        // For now, we'll simulate it and return success
+        logDebug(`📧 Would send owner verification email to ${email} for user ${username}`);
+        logDebug(`🔐 Verification token: ${verificationToken}`);
+
+        res.json({
+          success: true,
+          message: 'Owner verification email sent successfully'
+        });
+      } else {
+        res.status(400).json({ success: false, message: 'Email, username, and verification token required' });
+      }
+    }
+
+    // Handle subscription tiers
+    else if (req.path.includes('/subscriptions/tiers') && req.method === 'GET') {
+      res.json({
+        success: true,
+        data: {
+          'FREE': {
+            name: 'Free Tier',
+            price: 0,
+            features: 'Basic chat features'
+          },
+          'BOOST_PLUS_TIER_2': {
+            name: 'BOOST+ Tier 2',
+            price: 8.99,
+            features: 'Stream screen at 1920x1080p 60FPS - Monthly $8.99 / One-time $15.99'
+          },
+          'BOOST_PLUS_TIER_3': {
+            name: 'BOOST+ Tier 3',
+            price: 12.99,
+            features: 'Stream screen at 2160x1080 60FPS - Monthly $12.99 / One-time $25.99'
+          },
+          'BOOST_PLUS_TIER_4': {
+            name: 'BOOST+ Tier 4',
+            price: 25.99,
+            features: 'Stream screen at 2160x1080 60FPS/4K - Monthly $25.99 / One-time $100.99'
+          },
+          'BOOST_PLUS_TIER_5': {
+            name: 'BOOST+ Tier 5',
+            price: 30.99,
+            features: 'Stream screen at 3860x1440p 60fps with NVIDIA GeForce RTX 30/40/50 series GPU auto detection - Monthly $30.99 / One-time $350.99'
+          }
+        }
+      });
+    }
+
+    // Handle payment methods
+    else if (req.path.includes('/subscriptions/payment-methods') && req.method === 'GET') {
+      res.json({
+        success: true,
+        data: {
+          'BTC': { name: 'Bitcoin', description: 'Cryptocurrency payment' },
+          'CREDIT_CARD': { name: 'Credit Card', description: 'Traditional card payment' },
+          'DEBIT_CARD': { name: 'Debit Card', description: 'Bank card payment' },
+          'PAYPAL': { name: 'PayPal', description: 'PayPal payment' }
+        }
+      });
+    }
+
+    // Handle BTC wallet
+    else if (req.path.includes('/subscriptions/btc-wallet') && req.method === 'GET') {
+      res.json({
+        success: true,
+        data: {
+          btcWallet: '1M9mactBVv4ygScFxzHbEsXHcvvH8WrvPG'
+        }
+      });
     }
 
     // Handle room endpoints
@@ -980,17 +1076,29 @@ function createWindow() {
     return;
   }
 
-  // Check for auto-login account using the handler directly
+  // Force authentication check on startup
   setTimeout(async () => {
     try {
-      // Use the handler function directly
+      // Check for existing authentication
       const accountLock = await checkAccountLock();
       if (accountLock.success && global.autoLoginAccount) {
         console.log('🔐 Auto-login account found:', global.autoLoginAccount.username);
         mainWindow.webContents.send('auto-login', global.autoLoginAccount);
+      } else {
+        // Force user to login/signup
+        console.log('🔐 No valid authentication found, redirecting to login');
+        mainWindow.webContents.send('force-auth-required', {
+          message: 'Please login or create an account to continue',
+          showBoostTiers: true
+        });
       }
     } catch (error) {
-      console.error('Error checking account lock:', error);
+      console.error('Error checking authentication:', error);
+      // Force authentication on error
+      mainWindow.webContents.send('force-auth-required', {
+        message: 'Authentication required to access VibeChat',
+        showBoostTiers: true
+      });
     }
   }, 2000);
 
@@ -1576,6 +1684,27 @@ ipcMain.handle('clear-logs', () => {
   errorLogs = [];
   aiUpdater.debugLogs = [];
   return { success: true };
+});
+
+ipcMain.handle('register-owner', async () => {
+  try {
+    const { AuthManager } = require('./dist/auth-manager');
+    const authManager = new AuthManager();
+
+    logDebug('🔑 Initiating owner registration from IPC...');
+    const result = await authManager.registerAsOwner();
+
+    if (result.success) {
+      logDebug('✅ Owner registration successful:', result.message);
+      return result;
+    } else {
+      logError('❌ Owner registration failed:', result.error);
+      return result;
+    }
+  } catch (error) {
+    logError('❌ Owner registration error:', error);
+    return { success: false, error: error.message };
+  }
 });
 
 // Auto-save IPC handlers

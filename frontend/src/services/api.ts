@@ -27,7 +27,7 @@ class ApiService {
     const isElectron = typeof window !== 'undefined' && window.electron;
 
     this.client = axios.create({
-      baseURL: process.env.REACT_APP_API_URL || (isElectron ? 'http://localhost:8082/api' : 'http://localhost:8082/api'),
+      baseURL: process.env.REACT_APP_API_URL || (isElectron ? 'http://localhost:3002/api' : 'http://localhost:3002/api'),
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
@@ -211,6 +211,11 @@ class ApiService {
 
   async getBTCWallet(): Promise<ApiResponse<{ btcWallet: string }>> {
     const response: AxiosResponse<ApiResponse<{ btcWallet: string }>> = await this.client.get('/subscriptions/btc-wallet');
+    return response.data;
+  }
+
+  async sendOwnerVerification(data: { email: string; username: string; verificationToken: string }): Promise<ApiResponse<void>> {
+    const response: AxiosResponse<ApiResponse<void>> = await this.client.post('/auth/send-owner-verification', data);
     return response.data;
   }
 }

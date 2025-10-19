@@ -65,6 +65,21 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Environment detection
   isDev: process.env.NODE_ENV === 'development',
+
+  // Owner control APIs
+  ownerAuthenticate: (credentials) => ipcRenderer.invoke('owner-authenticate', credentials),
+  ownerDashboardStats: () => ipcRenderer.invoke('owner-dashboard-stats'),
+  ownerUserManagement: (filters) => ipcRenderer.invoke('owner-user-management', filters),
+  ownerBanUser: (userId, reason) => ipcRenderer.invoke('owner-ban-user', userId, reason),
+  ownerUnbanUser: (userId) => ipcRenderer.invoke('owner-unban-user', userId),
+  ownerUpdateUserRole: (userId, newRole) => ipcRenderer.invoke('owner-update-user-role', userId, newRole),
+  ownerUpdateUserSubscription: (userId, newTier) => ipcRenderer.invoke('owner-update-user-subscription', userId, newTier),
+  ownerGetUserById: (userId) => ipcRenderer.invoke('owner-get-user-by-id', userId),
+  ownerExportData: () => ipcRenderer.invoke('owner-export-data'),
+  ownerSystemLogs: () => ipcRenderer.invoke('owner-system-logs'),
+  ownerIsAuthenticated: () => ipcRenderer.invoke('owner-is-authenticated'),
+  ownerGetCurrent: () => ipcRenderer.invoke('owner-get-current'),
+  ownerLogout: () => ipcRenderer.invoke('owner-logout'),
 });
 
 // Also expose a simple API for basic Electron functionality

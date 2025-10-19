@@ -41,19 +41,19 @@ spring:
       expiration: 864000000  # 10 days in milliseconds
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: vibechat.noreply@gmail.com
-    password: your-app-password-here
+    host: 127.0.0.1
+    port: 1025
+    username: toreythegizzler@pm.me
+    password: FTBGxYxABQPh4MArikvsyw
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+          connectiontimeout: 10000
+          timeout: 10000
+          writetimeout: 10000
 
 logging:
   level:
@@ -73,12 +73,12 @@ vibechat:
       - http://127.0.0.1:8080
   email:
     smtp:
-      host: smtp.gmail.com
-      port: 587
-      username: vibechat.noreply@gmail.com
-      password: your-app-password-here
+      host: 127.0.0.1
+      port: 1025
+      username: toreythegizzler@pm.me
+      password: FTBGxYxABQPh4MArikvsyw
       security: STARTTLS
-    # For development, disable email sending but keep verification working
-    enabled: false
+    # Enable email sending and verification for production
+    enabled: true
     verification:
-      enabled: false
+      enabled: true
