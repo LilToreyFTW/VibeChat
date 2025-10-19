@@ -50,7 +50,6 @@
       "build/**/*",
       "node_modules/**/*",
       "!**/node_modules/@types/**",
-      "!**/node_modules/electron",
       "!**/node_modules/electron-builder",
       "!**/node_modules/electron-devtools-installer",
       "!**/node_modules/typescript",
@@ -108,6 +107,7 @@
       "createStartMenuShortcut": true,
       "shortcutName": "VibeChat Desktop"
     },
+    "asar": false,
     "publish": {
       "provider": "generic",
       "url": "http://localhost:3001/updates/",

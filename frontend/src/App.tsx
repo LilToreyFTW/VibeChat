@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
-// Detect if running in Electron
-const isElectron = typeof window !== 'undefined' && window.electron;
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, useMediaQuery } from '@mui/material';
@@ -28,6 +25,9 @@ import SubscriptionManager from './components/billing/SubscriptionManager';
 
 // Hooks and Stores
 import { useAuthStore } from './store/authStore';
+
+// Detect if running in Electron
+const isElectron = typeof window !== 'undefined' && window.electron;
 
 // Create VibeChat modern theme
 const theme = createTheme({
