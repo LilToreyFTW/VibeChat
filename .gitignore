@@ -14,3 +14,5 @@ clients_chat_exe/dist/**/resources/app.asar
 **/resources/app.asar
 clients_chat_exe/dist/win-ia32-unpacked/resources/app.asar
 clients_chat_exe/dist/win-unpacked/resources/app.asar
+clients_chat_exe/dist/win-ia32-unpacked/resources/app.asar
+clients_chat_exe/dist/win-unpacked/resources/app.asar
